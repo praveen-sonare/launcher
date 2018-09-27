@@ -79,7 +79,7 @@ ApplicationWindow {
                 } else {
                     currentId = ''
                 }
-                homescreenHandler.tapShortcut(applicationModel.name(loc.index))
+                homescreenHandler.tapShortcut(applicationModel.appid(loc.index))
             }
             onPositionChanged: {
                 if (loc.currentId === '') return
