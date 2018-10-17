@@ -51,7 +51,8 @@ ApplicationWindow {
         visible: true
         cellWidth: 320
         cellHeight: 320
-        interactive: false
+        interactive: true
+        boundsBehavior: Flickable.StopAtBounds
 
         model: ApplicationModel { id: applicationModel }
         delegate: IconItem {
@@ -59,19 +60,43 @@ ApplicationWindow {
             height: grid.cellHeight
         }
 
+        onFlickStarted: {
+            console.warn("grid:onFlickStarted, status=", grid.flicking)
+        }
+
+        onFlickEnded: {
+            console.warn("grid:onFlickEnded, status=", grid.flicking)
+        }
+
+
+
         MouseArea {
             id: loc
             anchors.fill: parent
             property string currentId: ''
             property int newIndex: -1
-            property int index: grid.indexAt(loc.mouseX, loc.mouseY)
-            x: 62
-            y: 264
-            onPressAndHold: currentId = applicationModel.id(newIndex = index)
+            property int r_mouseX: loc.mouseX + grid.contentX
+            property int r_mouseY: loc.mouseY + grid.contentY
+            property bool flicking: grid.flicking
+            property int index: grid.indexAt(r_mouseX, r_mouseY)
+//            x: 62
+//            y: 264
+//            propagateComposedEvents: true
+            onPressAndHold: {
+                currentId = applicationModel.id(newIndex = index)
+                grid.interactive = false
+                console.warn("onPressAndHold:currentId = ", currentId, loc.mouseX, loc.mouseY, loc.index)
+                console.warn("onPressAndHold:r_mouseX = ", r_mouseX, "r_mouseY = ", r_mouseX, "contentY = ", grid.contentY)
+                for(var it in loc.children)
+                    console.warn("itx=", loc.children[it].x, "ity=", loc.children[it].y, '\n')
+            }
             onReleased: {
+                console.warn("onReleased:currentId = ", currentId, loc.mouseX, loc.mouseY, loc.index)
+                grid.interactive = true
                 if(loc.index < 0) {
                     return
                 }
+
                 if (currentId === '') {
                     pid = launcher.launch(applicationModel.id(loc.index))
                     if (1 < pid) {
@@ -83,13 +108,27 @@ ApplicationWindow {
                 } else {
                     currentId = ''
                 }
+//                homescreenHandler.tapShortcut(applicationModel.name(loc.index))
             }
             onPositionChanged: {
-                if (loc.currentId === '') return
+                if (loc.currentId === '') {
+                    console.warn("mouse.accepted = false")
+//                    mouse.accepted = false
+                    return
+                }
+                else {
+                    console.warn("mouse.accepted = true")
+//                    mouse.accepted = true
+                }
+
                 if (index < 0) return
                 if (index === newIndex) return
                     applicationModel.move(newIndex, newIndex = index)
             }
+
+//            onClicked: {
+//                console.warn("CLICKED ON")
+//            }
         }
     }
 }

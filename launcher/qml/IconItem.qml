@@ -22,13 +22,17 @@ Item {
     id: main
     width: 320
     height: 320
+    x: main.x
+    y: main.y
     property string icon: model.icon
 
     Item {
         id: container
         parent: loc
-        x: main.x
-        y: main.y
+//        x: main.x
+//        y: main.y
+        x: main.x - loc.r_mouseX + loc.mouseX
+        y: main.y - loc.r_mouseY + loc.mouseY
         width: main.width
         height: main.height
 
@@ -85,8 +89,8 @@ Item {
             text: qsTr(model.name.toUpperCase())
         }
 
-        Behavior on x { enabled: item.state !== 'active'; NumberAnimation { duration: 400; easing.type: Easing.OutCubic } }
-        Behavior on y { enabled: item.state !== 'active'; NumberAnimation { duration: 400; easing.type: Easing.OutCubic } }
+        Behavior on x { enabled: item.state !== 'active' && loc.flicking == false ; NumberAnimation { duration: 400; easing.type: Easing.OutCubic } }
+        Behavior on y { enabled: item.state !== 'active' && loc.flicking == false ; NumberAnimation { duration: 400; easing.type: Easing.OutCubic } }
         SequentialAnimation on rotation {
             NumberAnimation { to:  5; duration: 100 }
             NumberAnimation { to: -5; duration: 200 }
@@ -112,6 +116,8 @@ Item {
                     target: container
                     scale: 0.85
                     opacity: 0.75
+                    x: main.x - loc.r_mouseX + loc.mouseX
+                    y: main.y - loc.r_mouseY + loc.mouseY
                 }
             }
         ]
