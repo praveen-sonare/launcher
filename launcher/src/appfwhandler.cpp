@@ -31,14 +31,47 @@ static void _on_pws_hangup(void *closure)
 static void _on_pws_reply(void *closure, void *request, struct json_object *obj, const char *error, const char *info)
 {
     HMI_DEBUG("AppFwHandler", "%s called,error=[%s], info=[%s], obj=[%s]", __FUNCTION__, error, info, json_object_to_json_string(obj));
+    if(json_object_is_type(obj, json_type_object)) {
+        struct json_object *obj1, *obj2, *obj3;
+        json_object_object_get_ex(obj, "icon", &obj1);
+        json_object_object_get_ex(obj, "name", &obj2);
+        json_object_object_get_ex(obj, "id", &obj3);
+        if(json_object_is_type(obj3, json_type_null))
+            return;
+        QString icon = json_object_get_string(obj1);
+        QString name = json_object_get_string(obj2);
+        QString id = json_object_get_string(obj3);
+        QStringList info;
+        info << icon << name << id;
+        emit AppFwHandler::myself->applistupdate(info);
+    }
 }
 
 static void _on_pws_event_broadcast(void *closure, const char *event_name, struct json_object *data)
 {
     HMI_DEBUG("AppFwHandler", "%s called,event=%s, [%s]", __FUNCTION__, event_name, json_object_to_json_string(data));
     QStringList list = QString(event_name).split('/');
-    if(list[0] == "afm-main" && list[1] == "application-list-changed")
-        emit AppFwHandler::myself->applistupdate(data);
+    if(list[0] == "afm-main" && list[1] == "application-list-changed") {
+        struct json_object *obj1, *obj2;
+        json_object_object_get_ex(data, "operation", &obj1);
+        json_object_object_get_ex(data, "data", &obj2);
+        QString oper = json_object_get_string(obj1);
+        QString id = json_object_get_string(obj2);
+
+        if(oper == "uninstall") {
+            QStringList info;
+            // icon, name, id
+            info << "" << "" << id;
+            emit AppFwHandler::myself->applistupdate(info);
+        }
+        else if (oper == "install") {
+            // call state
+            AppFwHandler::myself->detail(id);
+        }
+        else {
+            HMI_DEBUG("AppFwHandler","data error");
+        }
+    }
 }
 
 // the callback interface for pws
@@ -90,6 +123,15 @@ int AppFwHandler::runnables(void)
 {
     int ret = 1;
     if(call(__FUNCTION__, "{\"info\":\"test my guess\"}") < 0)
+        ret = 0;
+    return ret;
+}
+
+int AppFwHandler::detail(QString id)
+{
+    int ret = 1;
+    HMI_DEBUG("AppFwHandler", "detail id is %s\n", id.toStdString().c_str());
+    if(call(__FUNCTION__, id.toStdString().c_str()) < 0)
         ret = 0;
     return ret;
 }

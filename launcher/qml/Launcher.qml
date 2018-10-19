@@ -59,6 +59,14 @@ ApplicationWindow {
             height: grid.cellHeight
         }
 
+        Connections {
+            target: appfwhandler
+            onApplistupdate: {
+                console.warn("applist update in Launcher.qml")
+                applicationModel.updateApplist(info);
+            }
+        }
+
         MouseArea {
             id: loc
             anchors.fill: parent

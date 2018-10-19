@@ -16,5 +16,7 @@
     <param name="urn:AGL:permission::system:run-by-default" value="required" />
     <param name="http://tizen.org/privilege/internal/dbus" value="required" />
     <param name="urn:AGL:permission:afm:system:widget" value="required" />
+    <param name="urn:AGL:permission:afm:system:runner" value="required" />
+    <param name="urn:AGL:permission:afm:system:runner:state" value="required" />
   </feature>
 </widget>

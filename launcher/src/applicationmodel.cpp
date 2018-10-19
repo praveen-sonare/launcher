@@ -33,6 +33,9 @@ class ApplicationModel::Private
 public:
     Private();
 
+    void addApp(QString icon, QString name, QString id);
+    void removeApp(QString id);
+
     QList<AppInfo> data;
 };
 
@@ -68,6 +71,29 @@ ApplicationModel::Private::Private()
         }
 
         HMI_DEBUG("launcher","name: %s icon: %s id: %s.", name.toStdString().c_str(), icon.toStdString().c_str(), id.toStdString().c_str());
+    }
+}
+
+void ApplicationModel::Private::addApp(QString icon, QString name, QString id)
+{
+    HMI_DEBUG("addApp","name: %s icon: %s id: %s.", name.toStdString().c_str(), icon.toStdString().c_str(), id.toStdString().c_str());
+    QString _icon = name.toLower();
+    if ( !QFile::exists(QString(":/images/%1_active.svg").arg(_icon)) ||
+         !QFile::exists(QString(":/images/%1_inactive.svg").arg(_icon)) )
+    {
+        _icon = "blank";
+    }
+    this->data.append(AppInfo(_icon, name, id));
+}
+
+void ApplicationModel::Private::removeApp(QString id)
+{
+    HMI_DEBUG("removeApp","id: %s.",id.toStdString().c_str());
+    for (int i = 0; i < this->data.size(); ++i) {
+          if (this->data.at(i).id() == id) {
+              this->data.removeAt(i);
+              break;
+          }
     }
 }
 
@@ -153,4 +179,28 @@ void ApplicationModel::move(int from, int to)
     } else {
         HMI_NOTICE("launcher","from : %d, to : %d. false.", from, to);
     }
+}
+
+void ApplicationModel::updateApplist(QStringList info)
+{
+    QString icon = info.at(0);
+    QString name = info.at(1);
+    QString id = info.at(2);
+    QString appid = id.split('@')[0];
+
+    if ( appid == "launcher" ||
+         appid == "homescreen-2017" ||
+         appid == "homescreen" ||
+         appid.contains("onscreen", Qt::CaseInsensitive)) {
+        return;
+    }
+    beginResetModel();
+    if(icon == "") { // uninstall
+        d->removeApp(id);
+    }
+    else {
+        // new app
+        d->addApp(icon, name, id);
+    }
+    endResetModel();
 }

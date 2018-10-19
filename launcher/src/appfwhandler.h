@@ -38,6 +38,7 @@ public:
 
     int init(void);
     int runnables(void);
+    int detail(QString id);
     void on_pws_hangup(void);
     void registerCallback(
         /* can't be NULL */
@@ -53,7 +54,7 @@ public:
 
     static AppFwHandler* myself;
 signals:
-    void applistupdate(struct json_object * obj);
+    void applistupdate(QStringList info);
 
 private slots:
     void connect_pws_timer_slot(void);
