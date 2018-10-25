@@ -77,6 +77,11 @@ ApplicationModel::Private::Private()
 void ApplicationModel::Private::addApp(QString icon, QString name, QString id)
 {
     HMI_DEBUG("addApp","name: %s icon: %s id: %s.", name.toStdString().c_str(), icon.toStdString().c_str(), id.toStdString().c_str());
+    for(int i = 0; i < this->data.size(); ++i) {
+        if(this->data[i].id() == id)
+            return;
+    }
+
     QString _icon = name.toLower();
     if ( !QFile::exists(QString(":/images/%1_active.svg").arg(_icon)) ||
          !QFile::exists(QString(":/images/%1_inactive.svg").arg(_icon)) )
