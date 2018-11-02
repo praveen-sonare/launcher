@@ -41,8 +41,8 @@ namespace {
     {
         QString icon = i["name"].toString().toLower();
 
-        if ( !QFile::exists(QString(":/images/%1_active.svg").arg(icon)) ||
-             !QFile::exists(QString(":/images/%1_inactive.svg").arg(icon)) )
+        if ( !QFile::exists(QString(":/images/%1_active.png").arg(icon)) ||
+             !QFile::exists(QString(":/images/%1_inactive.png").arg(icon)) )
         {
             icon = "blank";
         }
@@ -60,10 +60,27 @@ ApplicationModel::Private::Private()
         auto const id = jso["id"].toString();
         auto const icon = get_icon_name(jso);
 
-        if ( name != "launcher" &&
-             name != "homescreen-2017" &&
-             name != "homescreen" &&
-             name != "OnScreenApp") {
+        // Hide HomeScreen icon itself
+        if (name != "launcher" &&
+            name != "homescreen" &&
+            name != "HomeScreen" &&
+            !name.contains("OnScreen", Qt::CaseInsensitive)) {
+            this->data.append(AppInfo(icon, name, id));
+        }
+
+        HMI_DEBUG("launcher","name: %s icon: %s id: %s.", name.toStdString().c_str(), icon.toStdString().c_str(), id.toStdString().c_str());
+    }
+    for (auto const &app : japps.array()) {
+        QJsonObject const &jso = app.toObject();
+        auto const name = jso["name"].toString();
+        auto const id = jso["id"].toString();
+        auto const icon = get_icon_name(jso);
+
+        // Hide HomeScreen icon itself
+        if (name != "launcher" &&
+            name != "homescreen" &&
+            name != "HomeScreen" &&
+            !name.contains("OnScreen", Qt::CaseInsensitive)) {
             this->data.append(AppInfo(icon, name, id));
         }
 

@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>Launcher.qml</file>
         <file>IconItem.qml</file>
+        <file>ChangeItemPosition.js</file>
     </qresource>
 </RCC>

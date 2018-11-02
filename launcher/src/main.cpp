@@ -100,8 +100,6 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    AGLScreenInfo screenInfo(layoutHandler->get_scale_factor());
-
     if (layoutHandler->requestSurface(myname) != 0) {
         exit(EXIT_FAILURE);
     }
@@ -119,21 +117,6 @@ int main(int argc, char *argv[])
     layoutHandler->set_event_handler(QLibWindowmanager::Event_Invisible, [layoutHandler, launcher](json_object *object) {
         const char* label = json_object_get_string(	json_object_object_get(object, "drawing_name") );
         HMI_DEBUG("launch", "surface %s Event_Invisible", label);
-    });
-
-    homescreenHandler->init(port, token.toStdString().c_str());
-
-    homescreenHandler->set_event_handler(QLibHomeScreen::Event_TapShortcut, [layoutHandler, myname](json_object *object){
-        json_object *appnameJ = nullptr;
-        if(json_object_object_get_ex(object, "application_name", &appnameJ))
-        {
-            const char *appname = json_object_get_string(appnameJ);
-            if(myname == appname)
-            {
-                qDebug("Surface %s got tapShortcut\n", appname);
-                layoutHandler->activateSurface(myname);
-            }
-        }
     });
 
     QUrl bindingAddress;
@@ -158,15 +141,29 @@ int main(int argc, char *argv[])
 
     // mail.qml loading
     QQmlApplicationEngine engine;
-    engine.rootContext()->setContextProperty(QStringLiteral("layoutHandler"), layoutHandler);
-    engine.rootContext()->setContextProperty(QStringLiteral("homescreenHandler"), homescreenHandler);
-    engine.rootContext()->setContextProperty(QStringLiteral("launcher"), launcher);
-    engine.rootContext()->setContextProperty(QStringLiteral("screenInfo"), &screenInfo);
+    engine.rootContext()->setContextProperty("layoutHandler", layoutHandler);
+    engine.rootContext()->setContextProperty("homescreenHandler", homescreenHandler);
+    engine.rootContext()->setContextProperty("launcher", launcher);
     engine.load(QUrl(QStringLiteral("qrc:/Launcher.qml")));
 
     QObject *root = engine.rootObjects().first();
     QQuickWindow *window = qobject_cast<QQuickWindow *>(root);
     QObject::connect(window, SIGNAL(frameSwapped()), layoutHandler, SLOT(slotActivateSurface()));
+
+    homescreenHandler->init(port, token.toStdString().c_str());
+
+    homescreenHandler->set_event_handler(QLibHomeScreen::Event_TapShortcut, [layoutHandler, myname](json_object *object){
+        json_object *appnameJ = nullptr;
+        if(json_object_object_get_ex(object, "application_name", &appnameJ))
+        {
+            const char *appname = json_object_get_string(appnameJ);
+            if(myname == appname)
+            {
+                qDebug("Surface %s got tapShortcut\n", appname);
+                layoutHandler->activateSurface(myname);
+            }
+        }
+    });
 
     return a.exec();
 }
