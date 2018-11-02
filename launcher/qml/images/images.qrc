@@ -23,10 +23,10 @@
         <file>radio_inactive.svg</file>
         <file>settings_active.svg</file>
         <file>settings_inactive.svg</file>
-        <file>video_active.svg</file>
-        <file>video_inactive.svg</file>
-        <file>webbrowser_active.svg</file>
-        <file>webbrowser_inactive.svg</file>
+        <file>videoplayer_active.svg</file>
+        <file>videoplayer_inactive.svg</file>
+        <file>browser_active.svg</file>
+        <file>browser_inactive.svg</file>
         <file>blank_active.svg</file>
         <file>blank_inactive.svg</file>
         <file>plus_active.svg</file>
