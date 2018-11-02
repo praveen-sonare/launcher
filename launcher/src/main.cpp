@@ -153,16 +153,7 @@ int main(int argc, char *argv[])
     homescreenHandler->init(port, token.toStdString().c_str());
 
     homescreenHandler->set_event_handler(QLibHomeScreen::Event_TapShortcut, [layoutHandler, myname](json_object *object){
-        json_object *appnameJ = nullptr;
-        if(json_object_object_get_ex(object, "application_name", &appnameJ))
-        {
-            const char *appname = json_object_get_string(appnameJ);
-            if(myname == appname)
-            {
-                qDebug("Surface %s got tapShortcut\n", appname);
-                layoutHandler->activateSurface(myname);
-            }
-        }
+        layoutHandler->activateSurface(myname);
     });
 
     return a.exec();
