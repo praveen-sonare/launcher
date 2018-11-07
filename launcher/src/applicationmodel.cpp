@@ -60,10 +60,11 @@ ApplicationModel::Private::Private()
         auto const id = jso["id"].toString();
         auto const icon = get_icon_name(jso);
 
-        if ( name != "launcher" &&
-             name != "homescreen-2017" &&
-             name != "homescreen" &&
-             name != "OnScreenApp") {
+        // Hide HomeScreen icon itself
+        if (name != "launcher" && 
+	    name != "homescreen-2017" && 
+	    name != "homescreen" && 
+	    !name.contains("OnScreen", Qt::CaseInsensitive)) {
             this->data.append(AppInfo(icon, name, id));
         }
 
