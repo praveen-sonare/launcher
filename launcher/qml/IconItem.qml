@@ -22,7 +22,7 @@ import "ChangeItemPosition.js" as Cip
 Item {
     id: main
     width: 300
-    height: 485
+    height: 300
     property string icon: model.icon
     property int pid: -1
     property bool isBlank: false
@@ -88,11 +88,7 @@ Item {
 
         Image {
             id: item
-            anchors.top: parent.top
-            anchors.topMargin: 230
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: 300
-            height: 300
+            anchors.fill: parent
             source: './images/%1_active.png'.arg(model.icon)
             property string initial: model.name.substring(0,1).toUpperCase()
             property bool hasIcon: model.icon !== 'blank'

@@ -32,6 +32,7 @@ class ApplicationModel::Private
 {
 public:
     Private();
+    int loadAppInfo();
 
     QList<AppInfo> data;
 };
@@ -52,8 +53,19 @@ namespace {
 
 ApplicationModel::Private::Private()
 {
+    int appCount = 0;
+    while(appCount <= 22)
+    {
+        appCount += loadAppInfo();
+        HMI_DEBUG("launcher", "appCount = %d", appCount);
+    }
+}
+
+int ApplicationModel::Private::loadAppInfo()
+{
     QString apps = afm_user_daemon_proxy->runnables(QStringLiteral(""));
     QJsonDocument japps = QJsonDocument::fromJson(apps.toUtf8());
+    int appCount = 0;
     for (auto const &app : japps.array()) {
         QJsonObject const &jso = app.toObject();
         auto const name = jso["name"].toString();
@@ -67,25 +79,11 @@ ApplicationModel::Private::Private()
             !name.contains("OnScreen", Qt::CaseInsensitive)) {
             this->data.append(AppInfo(icon, name, id));
         }
+        appCount++;
 
         HMI_DEBUG("launcher","name: %s icon: %s id: %s.", name.toStdString().c_str(), icon.toStdString().c_str(), id.toStdString().c_str());
     }
-    for (auto const &app : japps.array()) {
-        QJsonObject const &jso = app.toObject();
-        auto const name = jso["name"].toString();
-        auto const id = jso["id"].toString();
-        auto const icon = get_icon_name(jso);
-
-        // Hide HomeScreen icon itself
-        if (name != "launcher" &&
-            name != "homescreen" &&
-            name != "HomeScreen" &&
-            !name.contains("OnScreen", Qt::CaseInsensitive)) {
-            this->data.append(AppInfo(icon, name, id));
-        }
-
-        HMI_DEBUG("launcher","name: %s icon: %s id: %s.", name.toStdString().c_str(), icon.toStdString().c_str(), id.toStdString().c_str());
-    }
+    return appCount;
 }
 
 ApplicationModel::ApplicationModel(QObject *parent)

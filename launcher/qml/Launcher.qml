@@ -23,6 +23,8 @@ import "ChangeItemPosition.js" as Cip
 
 ApplicationWindow {
     id: root
+    width: 1920
+    height: 720
 
     property int pid: -1
     property int firstPox: -1
@@ -50,7 +52,8 @@ ApplicationWindow {
             property int currentState: 1
 
             width: 300
-            height: 590
+            height: 300
+            anchors.topMargin: 230
 
             smooth: true
 
@@ -67,8 +70,8 @@ ApplicationWindow {
                 Rotation {
                     id: rotate
                     angle: 0
-                    origin.y: 243
-                    origin.x: 160
+                    origin.y: 150
+                    origin.x: 150
                     axis { x: 0; y: 1; z: 0 }
                     Behavior on angle {
                         NumberAnimation { easing.overshoot: 1; easing.type: Easing.OutBack; duration: 600 }
@@ -87,8 +90,8 @@ ApplicationWindow {
                 },
                 Scale {
                     id: scale
-                    origin.x: 160
-                    origin.y: 243
+                    origin.x: 150
+                    origin.y: 150
                     xScale: 1
                     yScale: 1
                     Behavior on xScale {
@@ -418,7 +421,7 @@ ApplicationWindow {
                     PropertyChanges {
                         target: trans
                         x: 0
-                        y: -50
+                        y: 0
                     }
                     PropertyChanges {
                         target: rect1
