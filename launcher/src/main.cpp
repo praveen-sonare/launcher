@@ -31,6 +31,7 @@
 #include "afm_user_daemon_proxy.h"
 #include "qlibhomescreen.h"
 #include "hmi-debug.h"
+#include "appfwhandler.h"
 
 // XXX: We want this DBus connection to be shared across the different
 // QML objects, is there another way to do this, a nice way, perhaps?
@@ -128,6 +129,9 @@ int main(int argc, char *argv[])
         layoutHandler->activateSurface(myname);
     });
 
+    AppFwHandler* appfwhandler = new AppFwHandler(myname.toStdString().c_str());
+    appfwhandler->init();
+
     QUrl bindingAddress;
     bindingAddress.setScheme(QStringLiteral("ws"));
     bindingAddress.setHost(QStringLiteral("localhost"));
@@ -154,6 +158,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty(QStringLiteral("homescreenHandler"), homescreenHandler);
     engine.rootContext()->setContextProperty(QStringLiteral("launcher"), launcher);
     engine.rootContext()->setContextProperty(QStringLiteral("screenInfo"), &screenInfo);
+    engine.rootContext()->setContextProperty(QStringLiteral("appfwhandler"), appfwhandler);
     engine.load(QUrl(QStringLiteral("qrc:/Launcher.qml")));
 
     QObject *root = engine.rootObjects().first();

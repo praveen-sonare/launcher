@@ -59,6 +59,14 @@ ApplicationWindow {
             height: grid.cellHeight
         }
 
+        Connections {
+            target: appfwhandler
+            onApplistupdate: {
+                console.warn("applist update in Launcher.qml")
+                applicationModel.updateApplist(info);
+            }
+        }
+
         MouseArea {
             id: loc
             anchors.fill: parent
@@ -67,15 +75,15 @@ ApplicationWindow {
             property int index: grid.indexAt(loc.mouseX, loc.mouseY)
             x: 62
             y: 264
-            anchors.rightMargin: 0
-            anchors.bottomMargin: 0
-            anchors.leftMargin: 0
-            anchors.topMargin: 0
             onPressAndHold: currentId = applicationModel.id(newIndex = index)
             onReleased: {
+                if(loc.index < 0) {
+                    return
+                }
                 if (currentId === '') {
                     pid = launcher.launch(applicationModel.id(loc.index))
                     if (1 < pid) {
+                        homescreenHandler.tapShortcut(applicationModel.name(loc.index))
                     }
                     else {
                         console.warn("app cannot be launched!")
@@ -83,7 +91,7 @@ ApplicationWindow {
                 } else {
                     currentId = ''
                 }
-                homescreenHandler.tapShortcut(applicationModel.name(loc.index))
+                //homescreenHandler.tapShortcut(applicationModel.name(loc.index))
             }
             onPositionChanged: {
                 if (loc.currentId === '') return

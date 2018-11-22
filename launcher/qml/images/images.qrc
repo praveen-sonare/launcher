@@ -27,9 +27,13 @@
         <file>video_inactive.svg</file>
         <file>browser_active.svg</file>
         <file>browser_inactive.svg</file>
+        <file>sdl_active.svg</file>
+        <file>sdl_inactive.svg</file>
         <file>blank_active.svg</file>
         <file>blank_inactive.svg</file>
         <file>plus_active.svg</file>
         <file>plus_inactive.svg</file>
+        <file>webbrowser_active.svg</file>
+        <file>webbrowser_inactive.svg</file>
     </qresource>
 </RCC>

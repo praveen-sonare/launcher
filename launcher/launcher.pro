@@ -18,7 +18,7 @@ TARGET = launcher
 QT = qml quick dbus websockets
 CONFIG += c++11 link_pkgconfig
 DESTDIR = $${OUT_PWD}/../package/root/bin
-PKGCONFIG += qlibwindowmanager qlibhomescreen
+PKGCONFIG += qlibwindowmanager qlibhomescreen libafbwsc
 
 include(../interfaces/interfaces.pri)
 
@@ -26,12 +26,14 @@ SOURCES += \
     src/main.cpp \
     src/applicationmodel.cpp \
     src/appinfo.cpp \
-    src/applicationlauncher.cpp
+    src/applicationlauncher.cpp \
+    src/appfwhandler.cpp
 
 HEADERS  += \
     src/applicationlauncher.h \
     src/applicationmodel.h \
-    src/appinfo.h
+    src/appinfo.h \
+    src/appfwhandler.h
 
 OTHER_FILES += \
     README.md
