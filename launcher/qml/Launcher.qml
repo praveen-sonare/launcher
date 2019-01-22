@@ -59,6 +59,21 @@ ApplicationWindow {
             height: grid.cellHeight
         }
 
+        Connections {
+            target: homescreenHandler
+            onAppListUpdate: {
+                console.warn("applist update in Launcher.qml")
+                applicationModel.updateApplist(info);
+            }
+        }
+        Connections {
+            target: homescreenHandler
+            onInitAppList: {
+                console.warn("applist init in Launcher.qml")
+                applicationModel.initAppList(data);
+            }
+        }
+
         MouseArea {
             id: loc
             anchors.fill: parent

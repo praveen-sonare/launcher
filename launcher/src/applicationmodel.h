@@ -35,6 +35,8 @@ public:
     Q_INVOKABLE QString id(int index) const;
     Q_INVOKABLE QString name(int index) const;
     Q_INVOKABLE void move(int from, int to);
+    Q_INVOKABLE void initAppList(QString data);
+    Q_INVOKABLE void updateApplist(QStringList info);
 
 private:
     class Private;
