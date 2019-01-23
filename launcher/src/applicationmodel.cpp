@@ -55,23 +55,6 @@ namespace {
 
 ApplicationModel::Private::Private()
 {
-//    QString apps = afm_user_daemon_proxy->runnables(QStringLiteral(""));
-//    QJsonDocument japps = QJsonDocument::fromJson(apps.toUtf8());
-//    for (auto const &app : japps.array()) {
-//        QJsonObject const &jso = app.toObject();
-//        auto const name = jso["name"].toString();
-//        auto const id = jso["id"].toString();
-//        auto const icon = get_icon_name(jso);
-
-//        if ( name != "launcher" &&
-//             name != "homescreen-2017" &&
-//             name != "homescreen" &&
-//             name != "OnScreenApp") {
-//            this->data.append(AppInfo(icon, name, id));
-//        }
-
-//        HMI_DEBUG("launcher","name: %s icon: %s id: %s.", name.toStdString().c_str(), icon.toStdString().c_str(), id.toStdString().c_str());
-//    }
 }
 
 void ApplicationModel::Private::addApp(QString icon, QString name, QString id)
