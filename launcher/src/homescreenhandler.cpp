@@ -59,6 +59,13 @@ void HomescreenHandler::init(int port, const char *token, QLibWindowmanager *qwm
         && json_object_object_get_ex(obj_param, "data", &obj_data)) {
             QString oper = json_object_get_string(obj_oper);
             if(oper == "uninstall") {
+                /* { "application_id": "launcher",
+                 *   "type": "application-list-changed",
+                 *   "parameter":{
+                 *      "operation": "uninstall",
+                 *      "data": "onstestapp@0.1"
+                 *   }
+                 * } */
                 QString id = json_object_get_string(obj_data);
                 QStringList info;
                 // icon, name, id
@@ -66,6 +73,25 @@ void HomescreenHandler::init(int port, const char *token, QLibWindowmanager *qwm
                 emit appListUpdate(info);
             }
             else if(oper == "install") {
+                /* { "application_id": "launcher",
+                 *   "type": "application-list-changed",
+                 *   "parameter": {
+                 *      "operation": "install",
+                 *      "data": {
+                 *          "description":"This is a demo onstestapp application",
+                 *          "name": "onstestapp",
+                 *          "shortname": "",
+                 *          "id": "onstestapp@0.1",
+                 *          "version": "0.1",
+                 *          "author": "Qt",
+                 *          "author-email": "",
+                 *          "width": "",
+                 *          "height": "",
+                 *          "icon": "\/var\/local\/lib\/afm\/applications\/onstestapp\/0.1\/icon.svg",
+                 *          "http-port": 31022
+                 *      }
+                 *    }
+                 * } */
                 struct json_object *obj_icon, *obj_name, *obj_id;
                 if(json_object_object_get_ex(obj_data, "icon", &obj_icon)
                 && json_object_object_get_ex(obj_data, "name", &obj_name)

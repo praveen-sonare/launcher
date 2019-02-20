@@ -180,7 +180,6 @@ void ApplicationModel::updateApplist(QStringList info)
     QString icon = info.at(0);
     QString name = info.at(1);
     QString id = info.at(2);
-    QString appid = id.split('@')[0];
 
     beginResetModel();
     if(icon == "") { // uninstall
@@ -195,6 +194,7 @@ void ApplicationModel::updateApplist(QStringList info)
 
 void ApplicationModel::initAppList(QString data)
 {
+    HMI_DEBUG("launcher","init application list.");
     beginResetModel();
     QJsonDocument japps = QJsonDocument::fromJson(data.toUtf8());
     for (auto const &app : japps.array()) {
@@ -204,7 +204,6 @@ void ApplicationModel::initAppList(QString data)
         auto const icon = get_icon_name(jso);
 
         d->addApp(icon, name, id);
-        HMI_DEBUG("launcher","name: %s icon: %s id: %s.", name.toStdString().c_str(), icon.toStdString().c_str(), id.toStdString().c_str());
     }
     endResetModel();
 }
