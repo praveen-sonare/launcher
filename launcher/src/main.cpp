@@ -152,9 +152,9 @@ int main(int argc, char *argv[])
     engine.load(QUrl(QStringLiteral("qrc:/Launcher.qml")));
     homescreenHandler->getRunnables();
 
-    QObject *root = engine.rootObjects().first();
-    QQuickWindow *window = qobject_cast<QQuickWindow *>(root);
-    QObject::connect(window, SIGNAL(frameSwapped()), layoutHandler, SLOT(slotActivateSurface()));
+//    QObject *root = engine.rootObjects().first();
+//    QQuickWindow *window = qobject_cast<QQuickWindow *>(root);
+//    QObject::connect(window, SIGNAL(frameSwapped()), layoutHandler, SLOT(slotActivateSurface()));
 
     return a.exec();
 }
