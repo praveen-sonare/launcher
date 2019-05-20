@@ -24,15 +24,14 @@ void* HomescreenHandler::myThis = 0;
 
 HomescreenHandler::HomescreenHandler(QObject *parent) :
     QObject(parent),
-    mp_hs(NULL)
+    mp_qhs(NULL)
 {
-
 }
 
 HomescreenHandler::~HomescreenHandler()
 {
-    if (mp_hs != NULL) {
-        delete mp_hs;
+    if (mp_qhs != NULL) {
+        delete mp_qhs;
     }
 }
 
@@ -42,16 +41,16 @@ void HomescreenHandler::init(int port, const char *token, QLibWindowmanager *qwm
     mp_qwm = qwm;
     m_myname = myname;
 
-    mp_hs = new LibHomeScreen();
-    mp_hs->init(port, token);
-    mp_hs->registerCallback(nullptr, HomescreenHandler::onRep_static);
+    mp_qhs = new QLibHomeScreen();
+    mp_qhs->init(port, token);
+    mp_qhs->registerCallback(nullptr, HomescreenHandler::onRep_static);
 
-    mp_hs->set_event_handler(LibHomeScreen::Event_ShowWindow,[this](json_object *object){
+    mp_qhs->set_event_handler(QLibHomeScreen::Event_ShowWindow,[this](json_object *object){
         HMI_DEBUG("Launcher","Surface launcher got Event_ShowWindow\n");
         mp_qwm->activateWindow(m_myname);
     });
 
-    mp_hs->set_event_handler(LibHomeScreen::Event_AppListChanged,[this](json_object *object){
+    mp_qhs->set_event_handler(QLibHomeScreen::Event_AppListChanged,[this](json_object *object){
         HMI_DEBUG("Launcher","laucher: appListChanged [%s]\n", json_object_to_json_string(object));
 
         struct json_object *obj_param, *obj_oper, *obj_data;
@@ -121,7 +120,7 @@ void HomescreenHandler::tapShortcut(QString application_id)
     value = json_object_new_string("normal.full");
     json_object_object_add(j_json, "area", value);
 
-    mp_hs->showWindow(application_id.toStdString().c_str(), j_json);
+    mp_qhs->showWindow(application_id.toStdString().c_str(), j_json);
 }
 
 void HomescreenHandler::onRep_static(struct json_object* reply_contents)
@@ -147,5 +146,10 @@ void HomescreenHandler::onRep(struct json_object* reply_contents)
 
 void HomescreenHandler::getRunnables(void)
 {
-    mp_hs->getRunnables();
+    mp_qhs->getRunnables();
+}
+
+void HomescreenHandler::setQuickWindow(QQuickWindow *qw)
+{
+    mp_qhs->setQuickWindow(qw);
 }

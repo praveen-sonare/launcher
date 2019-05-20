@@ -18,7 +18,7 @@ TARGET = launcher
 QT = qml quick dbus websockets
 CONFIG += c++11 link_pkgconfig
 DESTDIR = $${OUT_PWD}/../package/root/bin
-PKGCONFIG += qlibwindowmanager libhomescreen
+PKGCONFIG += qlibwindowmanager qlibhomescreen
 
 include(../interfaces/interfaces.pri)
 

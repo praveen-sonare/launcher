@@ -19,7 +19,8 @@
 #define HOMESCREENHANDLER_H
 
 #include <QObject>
-#include <libhomescreen.hpp>
+#include <QQuickWindow>
+#include <qlibhomescreen.h>
 #include <string>
 #include <qlibwindowmanager.h>
 
@@ -41,13 +42,14 @@ public:
 
     static void* myThis;
     static void onRep_static(struct json_object* reply_contents);
+    void setQuickWindow(QQuickWindow *qw);
 
 signals:
     void initAppList(QString data);
     void appListUpdate(QStringList info);
 
 private:
-    LibHomeScreen *mp_hs;
+    QLibHomeScreen *mp_qhs;
     QLibWindowmanager *mp_qwm;
     QString m_myname;
 };
