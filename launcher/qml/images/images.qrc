@@ -1,6 +1,13 @@
 <RCC>
     <qresource prefix="/images">
         <file>AGL_HMI_Blue_Background_Car-01.png</file>
+        <file>top_three_shortcut_background.png</file>
+        <file>meterdisplay.png</file>
+        <file>hud.png</file>
+        <file>background.png</file>
+        <file>uninstall.png</file>
+        <file>rse.png</file>
+        <file>DividingLine.svg</file>
         <file>connectivity_active.svg</file>
         <file>connectivity_inactive.svg</file>
         <file>dashboard_active.svg</file>
@@ -27,6 +34,10 @@
         <file>video_inactive.svg</file>
         <file>webbrowser_active.svg</file>
         <file>webbrowser_inactive.svg</file>
+        <file>browser_active.svg</file>
+        <file>browser_inactive.svg</file>
+        <file>sdl_active.svg</file>
+        <file>sdl_inactive.svg</file>
         <file>blank_active.svg</file>
         <file>blank_inactive.svg</file>
         <file>plus_active.svg</file>

@@ -190,8 +190,7 @@ void ApplicationModel::updateApplist(QStringList info)
     beginResetModel();
     if(icon == "") { // uninstall
         d->removeApp(id);
-    }
-    else {
+    } else {
         // new app
         d->addApp(icon, name, id);
     }

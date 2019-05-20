@@ -30,6 +30,7 @@
 #include "appinfo.h"
 #include "afm_user_daemon_proxy.h"
 #include "homescreenhandler.h"
+#include "shortcutappmodel.h"
 #include "hmi-debug.h"
 
 // XXX: We want this DBus connection to be shared across the different
@@ -88,6 +89,7 @@ int main(int argc, char *argv[])
 
     // import C++ class to QML
     qmlRegisterType<ApplicationModel>("AppModel", 1, 0, "ApplicationModel");
+    qmlRegisterType<ShortcutAppModel>("ShortcutAppModel", 1, 0, "ShortcutAppModel");
 
     // DBus
     qDBusRegisterMetaType<AppInfo>();
@@ -95,6 +97,7 @@ int main(int argc, char *argv[])
 
     ApplicationLauncher *launcher = new ApplicationLauncher();
     QLibWindowmanager* layoutHandler = new QLibWindowmanager();
+    ShortcutAppModel* shortcutAppModel = new ShortcutAppModel();
     if(layoutHandler->init(port,token) != 0){
         exit(EXIT_FAILURE);
     }
@@ -149,6 +152,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty(QStringLiteral("homescreenHandler"), homescreenHandler);
     engine.rootContext()->setContextProperty(QStringLiteral("launcher"), launcher);
     engine.rootContext()->setContextProperty(QStringLiteral("screenInfo"), &screenInfo);
+    engine.rootContext()->setContextProperty(QStringLiteral("shortcutAppModel"), shortcutAppModel);
     engine.load(QUrl(QStringLiteral("qrc:/Launcher.qml")));
     homescreenHandler->getRunnables();
 
