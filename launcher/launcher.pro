@@ -27,17 +27,20 @@ SOURCES += \
     src/applicationmodel.cpp \
     src/appinfo.cpp \
     src/applicationlauncher.cpp \
-    src/homescreenhandler.cpp
+    src/homescreenhandler.cpp \
+    src/shortcutappmodel.cpp
 
 HEADERS  += \
     src/applicationlauncher.h \
     src/applicationmodel.h \
     src/appinfo.h \
-    src/homescreenhandler.h
+    src/homescreenhandler.h \
+    src/shortcutappmodel.h
 
 OTHER_FILES += \
     README.md
 
 RESOURCES += \
+    qml/images/TopShortcut/topshortcut.qrc \
     qml/images/images.qrc \
     qml/qml.qrc

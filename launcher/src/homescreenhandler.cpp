@@ -18,8 +18,15 @@
 #include <QFileInfo>
 #include "homescreenhandler.h"
 #include <functional>
+#include <QProcess>
+#include <dirent.h>
+#include <stdio.h>
 #include "hmi-debug.h"
+#include "afm_user_daemon_proxy.h"
 
+extern org::AGL::afm::user *afm_user_daemon_proxy;
+
+#define BUF_SIZE 1024
 void* HomescreenHandler::myThis = 0;
 
 HomescreenHandler::HomescreenHandler(QObject *parent) :
@@ -110,6 +117,20 @@ void HomescreenHandler::init(int port, const char *token, QLibWindowmanager *qwm
             }
         }
     });
+
+    mp_qhs->set_event_handler(QLibHomeScreen::Event_UpdateShortcut,[this](json_object *object){
+        HMI_DEBUG("Launcher","Surface launcher got Event_UpdateShortcut\n");
+        json_object *obj_p = json_object_object_get(object, "parameter");
+        json_object *obj_array = json_object_object_get(obj_p, "shortcut");
+        QStringList shortcut_list;
+        for(int i = 0; i < 3; i++)
+        {
+            shortcut_list << QString(QLatin1String(json_object_get_string(json_object_object_get(json_object_array_get_idx(obj_array, i), "shortcut_id"))));
+            shortcut_list << QString(QLatin1String(json_object_get_string(json_object_object_get(json_object_array_get_idx(obj_array, i), "shortcut_name"))));
+        }
+        HMI_DEBUG("Launcher","SEvent_UpdateShortcut id1 = %s", shortcut_list.at(2).toStdString().c_str());
+        emit updateShortcutList(shortcut_list);
+    });
 }
 
 void HomescreenHandler::tapShortcut(QString application_id)
@@ -142,6 +163,51 @@ void HomescreenHandler::onRep(struct json_object* reply_contents)
             emit initAppList(data);
         }
     }
+}
+
+void HomescreenHandler::hideWindow(QString application_id)
+{
+    mp_qhs->hideWindow(application_id.section('@', 0, 0).toStdString().c_str());
+}
+
+void HomescreenHandler::registerShortcut(QString shortcut_id, QString shortcut_name, QString position)
+{
+//    struct json_object* j_obj = json_object_new_object();
+//    struct json_object* val_id = json_object_new_string(shortcut_id.toStdString().c_str());
+//    struct json_object* val_name = json_object_new_string(shortcut_name.toStdString().c_str());
+//    struct json_object* val_position = json_object_new_string(position.toStdString().c_str());
+//    json_object_object_add(j_obj, "shortcut_id", val_id);
+//    json_object_object_add(j_obj, "shortcut_name", val_name);
+//    json_object_object_add(j_obj, "position", val_position);
+
+    mp_qhs->registerShortcut(shortcut_id, shortcut_name, position);
+}
+
+int HomescreenHandler::uninstallApplication(QString application_id)
+{
+    int result = -1;
+    HMI_DEBUG("launcher","Application uninstall %s.", application_id.toStdString().c_str());
+
+    result = afm_user_daemon_proxy->uninstall(application_id).value().toInt();
+    HMI_DEBUG("launcher","ApplicationUninstall pid: %d.", result);
+
+//    QProcess *process = new QProcess();
+//    QString command = "/usr/bin/pkill " + application_id.section('@', 0, 0);
+//    HMI_DEBUG("launcher", "command is %s", command.toStdString().c_str());
+//    process->start(command);
+
+    return result;
+}
+
+void HomescreenHandler::sendAppToMeter(QString application_id)
+{
+    HMI_DEBUG("Launcher","sendAppToMeter %s", application_id.toStdString().c_str());
+    struct json_object* j_json = json_object_new_object();
+    struct json_object* value;
+    value = json_object_new_string("master.split.sub");
+    json_object_object_add(j_json, "area", value);
+
+    mp_qhs->showWindow(application_id.section('@', 0, 0).toStdString().c_str(), j_json);
 }
 
 void HomescreenHandler::getRunnables(void)

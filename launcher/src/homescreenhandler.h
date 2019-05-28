@@ -37,6 +37,10 @@ public:
 
     Q_INVOKABLE void tapShortcut(QString application_id);
     Q_INVOKABLE void getRunnables(void);
+    Q_INVOKABLE void hideWindow(QString application_id);
+    Q_INVOKABLE void registerShortcut(QString shortcut_id, QString shortcut_name, QString position);
+    Q_INVOKABLE int uninstallApplication(QString application_id);
+    Q_INVOKABLE void sendAppToMeter(QString application_id);
 
     void onRep(struct json_object* reply_contents);
 
@@ -47,6 +51,7 @@ public:
 signals:
     void initAppList(QString data);
     void appListUpdate(QStringList info);
+    void updateShortcutList(QStringList shortcut_list);
 
 private:
     QLibHomeScreen *mp_qhs;
