@@ -139,13 +139,14 @@ ApplicationWindow {
                 onReleased: {
                     if (currentId === '' && loc.index >= 0 ) {
                         // Not long press, exec application and tapshortcut
-                        pid = launcher.launch(applicationModel.id(loc.index))
-                        if (1 < pid) {
+//                        pid = launcher.launch(applicationModel.id(loc.index))
+//                        if (1 < pid) {
                             homescreenHandler.tapShortcut(applicationModel.appid(loc.index))
-                        }
-                        else {
-                            console.warn("app cannot be launched!")
-                        }
+
+//                        }
+//                        else {
+//                            console.warn("app cannot be launched!")
+//                        }
                     } else if (loc.mouseY <= 0) {
                         if (loc.mouseX >= 197 && loc.mouseX < 393) {
 //                            shortcutAppModel.changeShortcut(currentId, currentName, "0");
