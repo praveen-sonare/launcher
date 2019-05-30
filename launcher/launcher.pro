@@ -1,5 +1,5 @@
 # Copyright (C) 2016, 2017 Mentor Graphics Development (Deutschland) GmbH
-# Copyright (c) 2018,2019 TOYOTA MOTOR CORPORATION
+# Copyright (c) 2018 TOYOTA MOTOR CORPORATION
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,21 +26,16 @@ SOURCES += \
     src/main.cpp \
     src/applicationmodel.cpp \
     src/appinfo.cpp \
-    src/applicationlauncher.cpp \
-    src/homescreenhandler.cpp \
-    src/shortcutappmodel.cpp
+    src/applicationlauncher.cpp
 
 HEADERS  += \
     src/applicationlauncher.h \
     src/applicationmodel.h \
-    src/appinfo.h \
-    src/homescreenhandler.h \
-    src/shortcutappmodel.h
+    src/appinfo.h
 
 OTHER_FILES += \
     README.md
 
 RESOURCES += \
-    qml/images/TopShortcut/topshortcut.qrc \
     qml/images/images.qrc \
     qml/qml.qrc

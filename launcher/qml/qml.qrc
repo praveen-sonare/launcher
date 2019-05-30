@@ -2,8 +2,6 @@
     <qresource prefix="/">
         <file>Launcher.qml</file>
         <file>IconItem.qml</file>
-        <file>TopShortcutArea.qml</file>
-        <file>TopShortcutIcon.qml</file>
-        <file>UninstallDialog.qml</file>
+        <file>ChangeItemPosition.js</file>
     </qresource>
 </RCC>

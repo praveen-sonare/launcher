@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2016 The Qt Company Ltd.
  * Copyright (C) 2016, 2017 Mentor Graphics Development (Deutschland) GmbH
- * Copyright (c) 2018,2019 TOYOTA MOTOR CORPORATION
+ * Copyright (c) 2018 TOYOTA MOTOR CORPORATION
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,179 +19,498 @@ import QtQuick 2.6
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 2.0
 import AppModel 1.0
+import "ChangeItemPosition.js" as Cip
 
 ApplicationWindow {
-    width: container.width * container.scale
-    height: container.height * container.scale
+    id: root
+    width: 1920
+    height: 720
 
     property int pid: -1
+    property int firstPox: -1
+    property bool iconMoved: false
 
-    Item {
-        id: container
-        anchors.centerIn: parent
-        width: 1080
-        height: 1920
-//        scale: screenInfo.scale_factor()
-
-        Image {
-            id: topshortcutArea
-            x: 197
-            y: 0
-            width: 588
-            height: 215
-            source: './images/top_three_shortcut_background.png'
-            TopShortcutArea {
-                anchors.fill: parent
-            }
-        }
-
-        Image {
-            id: meterDisplay
-            x: 0
-            y: 1704
-            width: 270
-            height: 215
-            source: './images/meterdisplay.png'
-        }
-        Image {
-            id: hud
-            anchors.left: meterDisplay.right
-            anchors.top: meterDisplay.top
-            width: 270
-            height: 215
-            source: './images/hud.png'
-        }
-        Image {
-            id: rse
-            anchors.left: hud.right
-            anchors.top: hud.top
-            width: 270
-            height: 215
-            source: './images/rse.png'
-        }
-        Image {
-            id: uninstall
-            anchors.left: rse.right
-            anchors.top: rse.top
-            width: 270
-            height: 215
-            source: './images/uninstall.png'
-        }
-
-        Image {
-          anchors.fill: parent
-          source: './images/background.png'
-        }
-
-        GridView {
-            id: grid
-            anchors {
-              topMargin: 60 + 218; bottomMargin: 0
-              leftMargin: 60; rightMargin: 60
-              fill: parent
-            }
-            contentHeight: 320
-            flickableDirection: Flickable.AutoFlickDirection
-            snapMode: GridView.SnapOneRow
-            visible: true
-            cellWidth: 320
-            cellHeight: 320
-            interactive: false
-
-            model: ApplicationModel { id: applicationModel }
-            delegate: IconItem {
-                width: grid.cellWidth
-                height: grid.cellHeight
-            }
-
-            Connections {
-                target: homescreenHandler
-                onAppListUpdate: {
-                    console.warn("applist update in Launcher.qml")
-                    applicationModel.updateApplist(info);
-                }
-            }
-            Connections {
-                target: homescreenHandler
-                onInitAppList: {
-                    console.warn("applist init in Launcher.qml")
-                    applicationModel.initAppList(data);
-                }
-            }
-
-            MouseArea {
-                id: loc
-                anchors.fill: parent
-                property string currentId: ''
-                property string currentName: ''
-                property int oldIndex: -1
-                property int newIndex: -1
-                property int index: grid.indexAt(loc.mouseX, loc.mouseY)
-                x: 62
-                y: 264
-
-                onPressAndHold: {
-                    oldIndex = index
-                    currentId = applicationModel.id(newIndex = index)
-                    currentName = applicationModel.name(loc.index)
-                    homescreenHandler.hideWindow("homescreen")
-                }
-                onReleased: {
-                    if (currentId === '' && loc.index >= 0 ) {
-                        // Not long press, exec application and tapshortcut
-//                        pid = launcher.launch(applicationModel.id(loc.index))
-//                        if (1 < pid) {
-                            homescreenHandler.tapShortcut(applicationModel.appid(loc.index))
-
-//                        }
-//                        else {
-//                            console.warn("app cannot be launched!")
-//                        }
-                    } else if (loc.mouseY <= 0) {
-                        if (loc.mouseX >= 197 && loc.mouseX < 393) {
-//                            shortcutAppModel.changeShortcut(currentId, currentName, "0");
-                            homescreenHandler.registerShortcut(currentId, currentName, "0");
-                        } else if (loc.mouseX >= 393 && loc.mouseX < 589) {
-//                            shortcutAppModel.changeShortcut(currentId, currentName, "1");
-                            homescreenHandler.registerShortcut(currentId, currentName, "1");
-                        } else if (loc.mouseX >= 589 && loc.mouseX < 785) {
-//                            shortcutAppModel.changeShortcut(currentId, currentName, "2");
-                            homescreenHandler.registerShortcut(currentId, currentName, "2");
-                        }
-                        if (oldIndex != newIndex){
-                            applicationModel.move(newIndex, newIndex = oldIndex)
-                        }
-                    } else if (loc.mouseY >= 1488) {
-                        if (loc.mouseX < 270 ) {
-                            console.log("sendAppToMeter", currentId)
-                            homescreenHandler.sendAppToMeter(currentId)
-                        } else if (loc.mouseX >= 270 && loc.mouseX < 540 ) {
-
-                        } else if (loc.mouseX >= 540 && loc.mouseX < 810 ) {
-
-                        } else if (loc.mouseX >= 810) {
-                            uninstallDialog.contents = 'Do you want to uninstall ' + currentName.toUpperCase() + '?'
-                            uninstallDialog.uninstallApp = currentId
-                            uninstallDialog.visible = true
-                        }
-                    }
-
-                    currentName = ''
-                    currentId = ''
-                    homescreenHandler.tapShortcut("homescreen")
-                }
-                onPositionChanged: {
-                    if (loc.currentId === '') return
-                    if (index < 0) return
-                    if (index === newIndex) return
-                        applicationModel.move(newIndex, newIndex = index)
-                }
-            }
-        }
-        UninstallDialog {
-            id: uninstallDialog
-            anchors.fill: parent
-            visible: false
+    Timer {
+        id: timer
+        interval: 650
+        repeat: false
+        onTriggered: {
+            var centerItem = Cip.getCenterItem()
+            centerItem.state = "pos14"
+            centerImage.opacity = 1.0
         }
     }
+
+    Repeater {
+        id: repeater
+        model: ApplicationModel { id: applicationModel }
+
+        property int currentItem
+
+        IconItem {
+            id: rect1
+            property int currentState: 1
+
+            width: 300
+            height: 300
+            anchors.topMargin: 230
+
+            smooth: true
+
+            anchors.centerIn: parent
+
+            Behavior on opacity {
+                NumberAnimation { duration: 200 }
+            }
+
+            Behavior on z {
+                NumberAnimation { duration: 300 }
+            }
+            transform: [
+                Rotation {
+                    id: rotate
+                    angle: 0
+                    origin.y: 150
+                    origin.x: 150
+                    axis { x: 0; y: 1; z: 0 }
+                    Behavior on angle {
+                        NumberAnimation { easing.overshoot: 1; easing.type: Easing.OutBack; duration: 600 }
+                    }
+                },
+                Translate {
+                    id: trans
+                    x: 0
+                    y: 0
+                    Behavior on x {
+                        NumberAnimation { easing.overshoot: 1; easing.type: Easing.OutBack; duration: 600 }
+                    }
+                    Behavior on y {
+                        NumberAnimation { easing.overshoot: 1; easing.type: Easing.OutBack; duration: 600 }
+                    }
+                },
+                Scale {
+                    id: scale
+                    origin.x: 150
+                    origin.y: 150
+                    xScale: 1
+                    yScale: 1
+                    Behavior on xScale {
+                        NumberAnimation { easing.overshoot: 1; easing.type: Easing.OutBack; duration: 600 }
+                    }
+                    Behavior on yScale {
+                        NumberAnimation { easing.overshoot: 1; easing.type: Easing.OutBack; duration: 600 }
+                    }
+                }
+            ]
+
+            states: [
+                State {
+                    name: "pos0"
+                    PropertyChanges {
+                        target: rotate
+                        angle: 80
+                    }
+                    PropertyChanges {
+                        target: trans
+                        x: -1050
+                        y: 270
+                    }
+                    PropertyChanges {
+                        target: rect1
+                        z: 0
+                        opacity: 0
+                    }
+                    PropertyChanges {
+                        target: scale
+                        xScale: 1.2
+                        yScale: 1.2
+                    }
+                },
+                State {
+                    name: "pos1"
+                    PropertyChanges {
+                        target: rotate
+                        angle: 75
+                    }
+                    PropertyChanges {
+                        target: trans
+                        x: -700
+                        y: 0
+                    }
+                    PropertyChanges {
+                        target: rect1
+                        z: 0
+                        opacity: 1
+                    }
+                    PropertyChanges {
+                        target: scale
+                        xScale: 1.2
+                        yScale: 1.2
+                    }
+                },
+                State {
+                    name: "pos2"
+                    PropertyChanges {
+                        target: rotate
+                        angle: 60
+                    }
+                    PropertyChanges {
+                        target: trans
+                        x: -820
+                        y: 0
+                    }
+                    PropertyChanges {
+                        target: rect1
+                        z: 0
+                        opacity: 1
+                    }
+                    PropertyChanges {
+                        target: scale
+                        xScale: 0.79
+                        yScale: 0.79
+                    }
+                },
+                State {
+                    name: "pos3"
+                    PropertyChanges {
+                        target: rotate
+                        angle: 40
+                    }
+                    PropertyChanges {
+                        target: trans
+                        x: -780
+                        y: 0
+                    }
+                    PropertyChanges {
+                        target: rect1
+                        z: 0
+                        opacity: 1
+                    }
+                    PropertyChanges {
+                        target: scale
+                        xScale: 0.55
+                        yScale: 0.55
+                    }
+                },
+                State {
+                    name: "pos4"
+                    PropertyChanges {
+                        target: rotate
+                        angle: 15
+                    }
+                    PropertyChanges {
+                        target: trans
+                        x: -470
+                        y: 0
+                    }
+                    PropertyChanges {
+                        target: rect1
+                        z: 0
+                        opacity: 1
+                    }
+                    PropertyChanges {
+                        target: scale
+                        xScale: 0.45
+                        yScale: 0.45
+                    }
+                },
+                State {
+                    name: "pos5"
+                    PropertyChanges {
+                        target: rotate
+                        angle: 0
+                    }
+                    PropertyChanges {
+                        target: trans
+                        x: 0
+                        y: 0
+                    }
+                    PropertyChanges {
+                        target: rect1
+                        z: 1
+                        opacity: 1
+                    }
+                    PropertyChanges {
+                        target: scale
+                        xScale: 0.42
+                        yScale: 0.42
+                    }
+                },
+                State {
+                    name: "pos6"
+                    PropertyChanges {
+                        target: rotate
+                        angle: -15
+                    }
+                    PropertyChanges {
+                        target: trans
+                        x: 470
+                        y: 0
+                    }
+                    PropertyChanges {
+                        target: rect1
+                        z: 0
+                        opacity: 1
+                    }
+                    PropertyChanges {
+                        target: scale
+                        xScale: 0.45
+                        yScale: 0.45
+                    }
+                },
+                State {
+                    name: "pos7"
+                    PropertyChanges {
+                        target: rotate
+                        angle: -40
+                    }
+                    PropertyChanges {
+                        target: trans
+                        x: 780
+                        y: 0
+                    }
+                    PropertyChanges {
+                        target: rect1
+                        z: 0
+                        opacity: 1
+                    }
+                    PropertyChanges {
+                        target: scale
+                        xScale: 0.55
+                        yScale: 0.55
+                    }
+                },
+                State {
+                    name: "pos8"
+                    PropertyChanges {
+                        target: rotate
+                        angle: -60
+                    }
+                    PropertyChanges {
+                        target: trans
+                        x: 820
+                        y: 0
+                    }
+                    PropertyChanges {
+                        target: rect1
+                        z: 0
+                        opacity: 1
+                    }
+                    PropertyChanges {
+                        target: scale
+                        xScale: 0.79
+                        yScale: 0.79
+                    }
+                },
+                State {
+                    name: "pos9"
+                    PropertyChanges {
+                        target: rotate
+                        angle: -75
+                    }
+                    PropertyChanges {
+                        target: trans
+                        x: 700
+                        y: 0
+                    }
+                    PropertyChanges {
+                        target: rect1
+                        z: 0
+                        opacity: 1
+                    }
+                    PropertyChanges {
+                        target: scale
+                        xScale: 1.2
+                        yScale: 1.2
+                    }
+                },
+                State {
+                    name: "pos10"
+                    PropertyChanges {
+                        target: rotate
+                        angle: -80
+                    }
+                    PropertyChanges {
+                        target: trans
+                        x: 1050
+                        y: 270
+                    }
+                    PropertyChanges {
+                        target: rect1
+                        z: 0
+                        opacity: 0
+                    }
+                    PropertyChanges {
+                        target: scale
+                        xScale: 1.2
+                        yScale: 1.2
+                    }
+                },
+                State {
+                    name: "pos11"
+                    PropertyChanges {
+                        target: rotate
+                        angle: 0
+                    }
+                    PropertyChanges {
+                        target: trans
+                        x: 1050
+                        y: 540
+                    }
+                    PropertyChanges {
+                        target: rect1
+                        z: 0
+                        opacity: 0
+                    }
+                    PropertyChanges {
+                        target: scale
+                        xScale: 1
+                        yScale: 1
+                    }
+                },
+                State {
+                    name: "pos12"
+                    PropertyChanges {
+                        target: rotate
+                        angle: 0
+                    }
+                    PropertyChanges {
+                        target: trans
+                        x: 0
+                        y: 540
+                    }
+                    PropertyChanges {
+                        target: rect1
+                        z: 0
+                        opacity: 0
+                    }
+                    PropertyChanges {
+                        target: scale
+                        xScale: 1
+                        yScale: 1
+                    }
+                },
+                State {
+                    name: "pos13"
+                    PropertyChanges {
+                        target: rotate
+                        angle: 0
+                    }
+                    PropertyChanges {
+                        target: trans
+                        x: -1050
+                        y: 540
+                    }
+                    PropertyChanges {
+                        target: rect1
+                        z: 0
+                        opacity: 0
+                    }
+                    PropertyChanges {
+                        target: scale
+                        xScale: 1
+                        yScale: 1
+                    }
+                },
+                State {
+                    name: "pos14"
+                    PropertyChanges {
+                        target: rotate
+                        angle: 0
+                    }
+                    PropertyChanges {
+                        target: trans
+                        x: 0
+                        y: 0
+                    }
+                    PropertyChanges {
+                        target: rect1
+                        z: 1
+                        opacity: 1
+                    }
+                    PropertyChanges {
+                        target: scale
+                        xScale: 1
+                        yScale: 1
+                    }
+                }
+            ]
+        }
+
+    }
+    Component.onCompleted: {
+        repeater.currentItem = 5;
+        var count = repeater.count;
+        for ( var i = 0; i < repeater.count; i++)
+        {
+            var item = repeater.itemAt(i);
+            item.currentState = i + 1;
+            if ( item.currentState >= 1 && item.currentState <= 10 )
+            {
+                item.state = "pos" + item.currentState;
+                if ( item.currentState === 5 )
+                    item.state = "pos14";
+            } else if ( item.currentState === 15 ){
+                item.state = "pos11";
+            } else if ( item.currentState === 16 ){
+                item.state = "pos12";
+            } else if ( item.currentState === 17 ){
+                item.state = "pos13";
+            } else if ( item.currentState >= 18 ){
+                item.state = "pos0";
+            } else {
+                item.state = "pos10";
+            }
+        }
+    }
+
+    Image {
+        id: centerImage
+        source: './images/center_background.png'
+        height: 590
+        width: 350
+        anchors.centerIn: parent
+        opacity: 1.0
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        propagateComposedEvents: true
+        z: 2
+
+        onPressed: {
+            firstPox = mouseX;
+            iconMoved = false;
+            centerImage.opacity = 0.0;
+            if(mouseX >= 800 && mouseX <= 1120)
+            {
+                var item = Cip.getCenterItem()
+                item.iconPressed()
+            }
+        }
+
+        onReleased: {
+            timer.start()
+            if(mouseX >= 800 && mouseX <= 1120)
+            {
+                var item = Cip.getCenterItem()
+                item.iconReleased()
+            }
+        }
+
+        onClicked: {
+            if (iconMoved)
+            {
+                mouse.accepted = true
+            } else {
+                mouse.accepted = false
+            }
+        }
+
+        onPositionChanged: {
+            var item = Cip.getCenterItem()
+            Cip.move(mouseX, item)
+        }
+    }
+
 }
