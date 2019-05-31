@@ -54,7 +54,7 @@ void HomescreenHandler::init(int port, const char *token, QLibWindowmanager *qwm
 
     mp_qhs->set_event_handler(QLibHomeScreen::Event_ShowWindow,[this](json_object *object){
         HMI_DEBUG("Launcher","Surface launcher got Event_ShowWindow\n");
-        mp_qwm->activateWindow(m_myname);
+        mp_qwm->activateWindow(m_myname, "fullscreen");
     });
 
     mp_qhs->set_event_handler(QLibHomeScreen::Event_AppListChanged,[this](json_object *object){
