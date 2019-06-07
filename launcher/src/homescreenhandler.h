@@ -41,6 +41,7 @@ public:
     Q_INVOKABLE void registerShortcut(QString shortcut_id, QString shortcut_name, QString position);
     Q_INVOKABLE int uninstallApplication(QString application_id);
     Q_INVOKABLE void sendAppToMeter(QString application_id);
+    Q_INVOKABLE void sendAppToHud(QString application_id);
 
     void onRep(struct json_object* reply_contents);
 

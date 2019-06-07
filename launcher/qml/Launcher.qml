@@ -166,7 +166,8 @@ ApplicationWindow {
                             console.log("sendAppToMeter", currentId)
                             homescreenHandler.sendAppToMeter(currentId)
                         } else if (loc.mouseX >= 270 && loc.mouseX < 540 ) {
-
+                            console.log("sendAppToHud", currentId)
+                            homescreenHandler.sendAppToHud(currentId)
                         } else if (loc.mouseX >= 540 && loc.mouseX < 810 ) {
 
                         } else if (loc.mouseX >= 810) {

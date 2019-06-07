@@ -210,6 +210,18 @@ void HomescreenHandler::sendAppToMeter(QString application_id)
     mp_qhs->showWindow(application_id.section('@', 0, 0).toStdString().c_str(), j_json);
 }
 
+void HomescreenHandler::sendAppToHud(QString application_id)
+{
+    HMI_DEBUG("Launcher","sendAppToHud %s", application_id.toStdString().c_str());
+    struct json_object* j_json = json_object_new_object();
+    struct json_object* value;
+    value = json_object_new_string("hud.normal.full");
+    json_object_object_add(j_json, "area", value);
+
+    mp_qhs->showWindow(application_id.section('@', 0, 0).toStdString().c_str(), j_json);
+}
+
+
 void HomescreenHandler::getRunnables(void)
 {
     mp_qhs->getRunnables();
