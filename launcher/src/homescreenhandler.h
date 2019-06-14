@@ -55,9 +55,10 @@ signals:
     void updateShortcutList(QStringList shortcut_list);
 
 private:
+    void getLauncherArea();
     QLibHomeScreen *mp_qhs;
     QLibWindowmanager *mp_qwm;
-    QString m_myname;
+    QString m_myname, meter_area, hud_tbt_area;
 };
 
 #endif // HOMESCREENHANDLER_H

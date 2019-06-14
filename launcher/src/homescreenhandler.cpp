@@ -27,12 +27,16 @@
 extern org::AGL::afm::user *afm_user_daemon_proxy;
 
 #define BUF_SIZE 1024
+#define AREA_FILE_PATH "/etc/hmi-config/connection.json"
 void* HomescreenHandler::myThis = 0;
 
 HomescreenHandler::HomescreenHandler(QObject *parent) :
     QObject(parent),
-    mp_qhs(NULL)
+    mp_qhs(NULL),
+    meter_area(""),
+    hud_tbt_area("")
 {
+    getLauncherArea();
 }
 
 HomescreenHandler::~HomescreenHandler()
@@ -128,7 +132,6 @@ void HomescreenHandler::init(int port, const char *token, QLibWindowmanager *qwm
             shortcut_list << QString(QLatin1String(json_object_get_string(json_object_object_get(json_object_array_get_idx(obj_array, i), "shortcut_id"))));
             shortcut_list << QString(QLatin1String(json_object_get_string(json_object_object_get(json_object_array_get_idx(obj_array, i), "shortcut_name"))));
         }
-        HMI_DEBUG("Launcher","SEvent_UpdateShortcut id1 = %s", shortcut_list.at(2).toStdString().c_str());
         emit updateShortcutList(shortcut_list);
     });
 }
@@ -160,6 +163,7 @@ void HomescreenHandler::onRep(struct json_object* reply_contents)
         if(json_object_object_get_ex(obj_res, "data", &obj_data)) {
             HMI_DEBUG("launcher","HomescreenHandler emit initAppList");
             QString data = json_object_to_json_string(obj_data);
+            HMI_DEBUG("applist", "applist------%s", data.toStdString().c_str());
             emit initAppList(data);
         }
     }
@@ -172,14 +176,6 @@ void HomescreenHandler::hideWindow(QString application_id)
 
 void HomescreenHandler::registerShortcut(QString shortcut_id, QString shortcut_name, QString position)
 {
-//    struct json_object* j_obj = json_object_new_object();
-//    struct json_object* val_id = json_object_new_string(shortcut_id.toStdString().c_str());
-//    struct json_object* val_name = json_object_new_string(shortcut_name.toStdString().c_str());
-//    struct json_object* val_position = json_object_new_string(position.toStdString().c_str());
-//    json_object_object_add(j_obj, "shortcut_id", val_id);
-//    json_object_object_add(j_obj, "shortcut_name", val_name);
-//    json_object_object_add(j_obj, "position", val_position);
-
     mp_qhs->registerShortcut(shortcut_id, shortcut_name, position);
 }
 
@@ -204,7 +200,7 @@ void HomescreenHandler::sendAppToMeter(QString application_id)
     HMI_DEBUG("Launcher","sendAppToMeter %s", application_id.toStdString().c_str());
     struct json_object* j_json = json_object_new_object();
     struct json_object* value;
-    value = json_object_new_string("master.split.sub");
+    value = json_object_new_string(meter_area.toStdString().c_str());
     json_object_object_add(j_json, "area", value);
 
     mp_qhs->showWindow(application_id.section('@', 0, 0).toStdString().c_str(), j_json);
@@ -215,10 +211,11 @@ void HomescreenHandler::sendAppToHud(QString application_id)
     HMI_DEBUG("Launcher","sendAppToHud %s", application_id.toStdString().c_str());
     struct json_object* j_json = json_object_new_object();
     struct json_object* value;
-    value = json_object_new_string("hud.normal.full");
+    QString id = application_id.section('@', 0, 0);
+    value = json_object_new_string(hud_tbt_area.toStdString().c_str());
     json_object_object_add(j_json, "area", value);
 
-    mp_qhs->showWindow(application_id.section('@', 0, 0).toStdString().c_str(), j_json);
+    mp_qhs->showWindow(id.toStdString().c_str(), j_json);
 }
 
 
@@ -230,4 +227,42 @@ void HomescreenHandler::getRunnables(void)
 void HomescreenHandler::setQuickWindow(QQuickWindow *qw)
 {
     mp_qhs->setQuickWindow(qw);
+}
+
+void HomescreenHandler::getLauncherArea()
+{
+    QFile file(AREA_FILE_PATH);
+    if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QByteArray allData = file.readAll();
+        QString str(allData);
+        if(str == "") {
+            file.close();
+
+        }
+        QJsonParseError json_error;
+        QJsonDocument jsonDoc(QJsonDocument::fromJson(allData, &json_error));
+
+        if(json_error.error != QJsonParseError::NoError)
+        {
+             HMI_ERROR("Launcher", "connection.json error");
+             return;
+        }
+
+        QJsonObject rootObj = jsonDoc.object();
+        QJsonArray connectionsObj = rootObj.value("connections").toArray();
+
+        QJsonObject firstObj = connectionsObj.first().toObject();
+        QString meter = firstObj["screen_name"].toString();
+        QJsonArray meterAreaArray = firstObj.value("areas").toArray();
+        meter_area = meterAreaArray.first().toObject()["area_name"].toString();
+        meter_area = meter + "." + meter_area;
+
+        QJsonObject secondObj = connectionsObj.last().toObject();
+        QString hud = secondObj["screen_name"].toString();
+        QJsonArray hudAreaArray = secondObj.value("areas").toArray();
+        hud_tbt_area = hudAreaArray.first().toObject()["area_name"].toString();
+        hud_tbt_area = hud + "." + hud_tbt_area;
+
+    }
+    file.close();
 }

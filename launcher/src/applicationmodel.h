@@ -19,6 +19,11 @@
 #define APPLICATIONMODEL_H
 
 #include <QtCore/QAbstractListModel>
+enum {
+    CHANGE,
+    ADD,
+    REMOVE
+};
 
 class ApplicationModel : public QAbstractListModel
 {
@@ -37,8 +42,10 @@ public:
     Q_INVOKABLE void move(int from, int to);
     Q_INVOKABLE void initAppList(QString data);
     Q_INVOKABLE void updateApplist(QStringList info);
+    Q_INVOKABLE void recordAppsPosition();
 
 private:
+
     class Private;
     Private *d;
 };

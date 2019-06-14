@@ -1,0 +1,64 @@
+{
+    "applist": [
+        {
+            "flag": "0",
+            "id": "radio@0.1",
+            "name": "Radio"
+        },
+        {
+            "flag": "0",
+            "id": "poi@0.1",
+            "name": "POI"
+        },
+        {
+            "flag": "0",
+            "id": "dashboard@0.1",
+            "name": "Dashboard"
+        },
+        {
+            "flag": "0",
+            "id": "hvac@0.1",
+            "name": "HVAC"
+        },
+        {
+            "flag": "0",
+            "id": "mixer@7.0",
+            "name": "mixer"
+        },
+        {
+            "flag": "0",
+            "id": "navigation@0.1",
+            "name": "navigation"
+        },
+        {
+            "flag": "0",
+            "id": "phone@0.1",
+            "name": "Phone"
+        },
+        {
+            "flag": "0",
+            "id": "mediaplayer@0.1",
+            "name": "MediaPlayer"
+        },
+        {
+            "flag": "0",
+            "id": "settings@0.1",
+            "name": "Settings"
+        },
+        {
+            "flag": "0",
+            "id": "hudspeed@0.1",
+            "name": "Hudspeed"
+        },
+        {
+            "flag": "0",
+            "id": "tbtnavi@0.1",
+            "name": "tbtnavi"
+        },
+        {
+            "flag": "0",
+            "id": "hudtbt@0.1",
+            "name": "Hudtbt"
+        }
+    ]
+}

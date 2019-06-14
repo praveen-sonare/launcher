@@ -23,9 +23,15 @@
 
 #include <QtDBus/QDBusInterface>
 #include <QtDBus/QDBusReply>
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonParseError>
+#include <QJsonObject>
+#include <json_object.h>
+#include <unistd.h>
 
 #include "afm_user_daemon_proxy.h"
-
+#define APPLIST_PATH "/var/local/lib/afm/applications/launcher/0.1/etc/applist.json"
 extern org::AGL::afm::user *afm_user_daemon_proxy;
 
 class ApplicationModel::Private
@@ -33,6 +39,7 @@ class ApplicationModel::Private
 public:
     Private();
 
+    void appendApp(QString icon, QString name, QString id);
     void addApp(QString icon, QString name, QString id);
     void removeApp(QString id);
 
@@ -78,6 +85,25 @@ void ApplicationModel::Private::addApp(QString icon, QString name, QString id)
             break;
     }
     this->data.insert(pos, AppInfo(_icon, name, id));
+}
+
+
+void ApplicationModel::Private::appendApp(QString icon, QString name, QString id)
+{
+    HMI_DEBUG("addApp","name: %s icon: %s id: %s.", name.toStdString().c_str(), icon.toStdString().c_str(), id.toStdString().c_str());
+    for(int i = 0; i < this->data.size(); ++i) {
+        if(this->data[i].id() == id)
+            return;
+    }
+
+    QString _icon = name.toLower();
+    if ( !QFile::exists(QString(":/images/%1_active.svg").arg(_icon)) ||
+         !QFile::exists(QString(":/images/%1_inactive.svg").arg(_icon)) )
+    {
+        _icon = "blank";
+    }
+
+    this->data.append(AppInfo(_icon, name, id));
 }
 
 void ApplicationModel::Private::removeApp(QString id)
@@ -202,14 +228,120 @@ void ApplicationModel::initAppList(QString data)
 {
     HMI_DEBUG("launcher","init application list.");
     beginResetModel();
+    QFile file(APPLIST_PATH);
     QJsonDocument japps = QJsonDocument::fromJson(data.toUtf8());
-    for (auto const &app : japps.array()) {
-        QJsonObject const &jso = app.toObject();
-        auto const name = jso["name"].toString();
-        auto const id = jso["id"].toString();
-        auto const icon = get_icon_name(jso);
+    if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QByteArray allData = file.readAll();
+        QString str(allData);
+        if(str == "") {
+            file.close();
 
-        d->addApp(icon, name, id);
+        }
+        QJsonParseError json_error;
+        QJsonDocument jsonDoc(QJsonDocument::fromJson(allData, &json_error));
+
+        if(json_error.error != QJsonParseError::NoError)
+        {
+             HMI_ERROR("Launcher", "connection.json error");
+             return;
+        }
+        HMI_DEBUG("initAppList1","initAppList 1");
+
+        QJsonObject rootObj = jsonDoc.object();
+        QJsonArray arrayObj = rootObj.value("applist").toArray();
+        QJsonArray newAreaObj;
+        HMI_DEBUG("initAppList1","initAppList 2");
+        HMI_DEBUG("initAppList1","initAppList size %d",arrayObj.size());
+        QJsonObject subObj1;
+        subObj1 = arrayObj.at(2).toObject();
+        HMI_DEBUG("initAppList1","initAppList iiid=%s",subObj1["id"].toString().toStdString().c_str());
+        //check list
+        for (auto const &app : japps.array()) {
+            QJsonObject const &jso = app.toObject();
+            auto const name = jso["name"].toString();
+            auto const id = jso["id"].toString();
+            bool haveNewApp = false;
+
+            for (int i = 0; i < arrayObj.size(); ++i) {
+                QJsonObject subObj = arrayObj.at(i).toObject();
+                HMI_DEBUG("initAppList1","initAppList %s",subObj["id"].toString().toStdString().c_str());
+                if((id == subObj["id"].toString()) && (name == subObj["name"].toString())) {
+                    HMI_DEBUG("initAppList1","initAppList flag--%s",subObj["flag"].toString().toStdString().c_str());
+                    subObj.remove("flag");
+                    subObj.insert("flag", "1");
+                    arrayObj.replace(i, subObj);
+                    HMI_DEBUG("initAppList1","initAppList flag---%s",subObj["flag"].toString().toStdString().c_str());
+                    haveNewApp = false;
+                    break;
+                } else {
+                    haveNewApp = true;
+                }
+            }
+            if(haveNewApp) {
+                QJsonObject newObj;
+                newObj.insert("id", id);
+                newObj.insert("name", name);
+                newObj.insert("flag", "1");
+                newAreaObj.append(newObj);
+            }
+        }
+        HMI_DEBUG("initAppList1","initAppList 3");
+
+        //updatelist
+        for (int i = 0; i < arrayObj.size(); ++i) {
+            QJsonObject subObj = arrayObj.at(i).toObject();
+            HMI_DEBUG("initAppList1", "flag==%s", subObj["flag"].toString().toStdString().c_str());
+            if(subObj["flag"].toString() == "1") {
+                d->appendApp(get_icon_name(subObj), subObj["name"].toString(), subObj["id"].toString());
+            }
+        }
+        HMI_DEBUG("initAppList1","initAppList 4");
+
+        if(newAreaObj.size() > 0) {
+            for(int i = 0; i < newAreaObj.size(); ++i) {
+                QJsonObject subObj = newAreaObj.at(i).toObject();
+                d->appendApp(get_icon_name(subObj), subObj["name"].toString(), subObj["id"].toString());
+            }
+        }
+    } else {
+        HMI_ERROR("Launcher", "read applist.json file failed");
+        for (auto const &app : japps.array()) {
+            QJsonObject const &jso = app.toObject();
+            auto const name = jso["name"].toString();
+            auto const id = jso["id"].toString();
+            auto const icon = get_icon_name(jso);
+
+            d->addApp(icon, name, id);
+        }
     }
+    HMI_DEBUG("initAppList1","initAppList 5");
+    file.close();
     endResetModel();
+    recordAppsPosition();
+}
+void ApplicationModel::recordAppsPosition()
+{
+    QFile file(APPLIST_PATH);
+    if(file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+
+        QJsonObject rootObj;
+        QJsonArray arrayObj;
+        for(int i = 0; i < d->data.size(); ++i) {
+            QJsonObject subObj;
+            subObj.insert("id", d->data.at(i).id());
+            subObj.insert("name", d->data.at(i).name());
+            subObj.insert("flag", "0");
+            arrayObj.append(subObj);
+        }
+        rootObj.insert("applist", arrayObj);
+        QJsonDocument jsonDoc;
+        jsonDoc.setObject(rootObj);
+        file.write(jsonDoc.toJson());
+
+    } else {
+        HMI_ERROR("Launcher", "write to applist.json file failed");
+    }
+    file.flush();
+    fsync(file.handle());
+    file.close();
 }
