@@ -132,6 +132,11 @@ Item {
 //        } else {
 //            console.warn("app cannot be launched!")
 //        }
-        homescreenHandler.tapShortcut(model.name)
+        // homescreenHandler.tapShortcut(model.name)
+        var name = model.name.toLowerCase()
+        if(name == "hudspeed")
+            homescreenHandler.showWindow(name, "hud.upper.left")
+        else
+            homescreenHandler.tapShortcut(name)
     }
 }
