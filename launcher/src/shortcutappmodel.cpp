@@ -51,8 +51,8 @@ void ShortcutAppModel::init()
 {
     RegisterApp temp;
     for(int i = 0; i < 3; i++) {
-        temp.id = "video@0.1";
-        temp.name = "video";
+        temp.id = "error@0.1";
+        temp.name = "error";
         temp.icon = getIconPath(temp.id);
         if (temp.icon == "") {
             temp.isBlank = true;
@@ -108,8 +108,8 @@ void ShortcutAppModel::shortcutUpdate(QStringList shortcut_list)
     HMI_DEBUG("Launcher", "ShortcutAppModel::shortcutUpdate id1=%s", shortcut_list.at(1).toStdString().c_str());
     RegisterApp temp;
     for(int i = 0; i < d->data.size(); i++) {
-        temp.id = shortcut_list.at(2 * i);
-        temp.name = shortcut_list.at(2 * i + 1);
+        temp.id = shortcut_list.at(2 * i) == "" ? "error@0.1" : shortcut_list.at(2 * i);
+        temp.name = shortcut_list.at(2 * i + 1) == "" ? "error" : shortcut_list.at(2 * i + 1);
         temp.icon = getIconPath(temp.id);
         if (temp.icon == "") {
             temp.isBlank = true;

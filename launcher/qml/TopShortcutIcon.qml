@@ -54,16 +54,16 @@ MouseArea {
             cached: true
         }
     }
-    Label {
-        id: name
-        y: 160
-        width: root.width - 10
-        font.pixelSize: 15
-        font.letterSpacing: 5
-        // wrapMode: Text.WordWrap
-        anchors.horizontalCenter: parent.horizontalCenter
-        horizontalAlignment: Text.AlignHCenter
-        color: "white"
-        text: qsTr(root.name).toUpperCase()
-    }
+//    Label {
+//        id: name
+//        y: 160
+//        width: root.width - 10
+//        font.pixelSize: 15
+//        font.letterSpacing: 5
+//        // wrapMode: Text.WordWrap
+//        anchors.horizontalCenter: parent.horizontalCenter
+//        horizontalAlignment: Text.AlignHCenter
+//        color: "white"
+//        text: qsTr(root.name).toUpperCase()
+//    }
 }

@@ -5,5 +5,7 @@
         <file>TopShortcutArea.qml</file>
         <file>TopShortcutIcon.qml</file>
         <file>UninstallDialog.qml</file>
+        <file>BottomShortcutArea.qml</file>
+        <file>AnimationBar.qml</file>
     </qresource>
 </RCC>

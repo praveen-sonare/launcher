@@ -12,5 +12,7 @@
         <file>video_active.svg</file>
         <file>sdl_usb.svg</file>
         <file>sdl_usb_active.svg</file>
+        <file>error.svg</file>
+        <file>error_active.svg</file>
     </qresource>
 </RCC>

@@ -25,6 +25,7 @@ ApplicationWindow {
     height: container.height * container.scale
 
     property int pid: -1
+    property bool isLongPress: false
 
     Item {
         id: container
@@ -32,6 +33,11 @@ ApplicationWindow {
         width: 1080
         height: 1920
 //        scale: screenInfo.scale_factor()
+
+        Image {
+          anchors.fill: parent
+          source: './images/background.png'
+        }
 
         Image {
             id: topshortcutArea
@@ -45,42 +51,17 @@ ApplicationWindow {
             }
         }
 
-        Image {
-            id: meterDisplay
+        AnimationBar {
+            id: animationbar
             x: 0
             y: 1704
-            width: 270
-            height: 215
-            source: './images/meterdisplay.png'
-        }
-        Image {
-            id: hud
-            anchors.left: meterDisplay.right
-            anchors.top: meterDisplay.top
-            width: 270
-            height: 215
-            source: './images/hud.png'
-        }
-        Image {
-            id: rse
-            anchors.left: hud.right
-            anchors.top: hud.top
-            width: 270
-            height: 215
-            source: './images/rse.png'
-        }
-        Image {
-            id: uninstall
-            anchors.left: rse.right
-            anchors.top: rse.top
-            width: 270
-            height: 215
-            source: './images/uninstall.png'
+            state: 'release'
         }
 
-        Image {
-          anchors.fill: parent
-          source: './images/background.png'
+        BottomShortcutArea {
+            id: bottomshortcutarea
+            x: 0
+            y: 1704
         }
 
         GridView {
@@ -135,6 +116,9 @@ ApplicationWindow {
                     currentId = applicationModel.id(newIndex = index)
                     currentName = applicationModel.name(loc.index)
                     homescreenHandler.hideWindow("homescreen")
+                    animationbar.state = 'press'
+                    animationbar.startAnimationTimer()
+                    isLongPress = true
                 }
                 onReleased: {
                     if (currentId === '' && loc.index >= 0 ) {
@@ -151,15 +135,15 @@ ApplicationWindow {
                             applicationModel.move(newIndex, newIndex = oldIndex)
                         }
                     } else if (loc.mouseY >= 1488) {
-                        if (loc.mouseX < 270 ) {
+                        if (loc.mouseX < 295 ) {
                             console.log("sendAppToMeter", currentId)
                             homescreenHandler.sendAppToMeter(currentId)
-                        } else if (loc.mouseX >= 270 && loc.mouseX < 540 ) {
+                        } else if (loc.mouseX >= 295 && loc.mouseX < 590 ) {
                             console.log("sendAppToHud", currentId)
                             homescreenHandler.sendAppToHud(currentId)
-                        } else if (loc.mouseX >= 540 && loc.mouseX < 810 ) {
+                        } else if (loc.mouseX >= 590 && loc.mouseX < 885 ) {
 
-                        } else if (loc.mouseX >= 810) {
+                        } else if (loc.mouseX >= 885) {
                             uninstallDialog.contents = 'Do you want to uninstall ' + currentName.toUpperCase() + '?'
                             uninstallDialog.uninstallApp = currentId
                             uninstallDialog.visible = true
@@ -172,7 +156,12 @@ ApplicationWindow {
 
                     currentName = ''
                     currentId = ''
-                    homescreenHandler.tapShortcut("homescreen")
+                    if (isLongPress) {
+                        homescreenHandler.tapShortcut("homescreen")
+                        isLongPress = false
+                        animationbar.state = 'release'
+                        animationbar.stopAnimationTimer()
+                    }
                 }
                 onPositionChanged: {
                     if (loc.currentId === '') return

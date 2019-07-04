@@ -79,7 +79,7 @@ Item {
                 spacing: 10
                 Image {
                     id: dsp_mark
-                    source: './images/uninstall.png'
+                    source: './images/shotcuticon_dustbox.svg'
                     Layout.maximumHeight: 120
                     Layout.maximumWidth:  120
                 }

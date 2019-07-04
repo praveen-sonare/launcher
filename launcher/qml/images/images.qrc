@@ -2,11 +2,17 @@
     <qresource prefix="/images">
         <file>AGL_HMI_Blue_Background_Car-01.png</file>
         <file>top_three_shortcut_background.png</file>
-        <file>meterdisplay.png</file>
-        <file>hud.png</file>
         <file>background.png</file>
-        <file>uninstall.png</file>
-        <file>rse.png</file>
+        <file>shotcuticon_hud.svg</file>
+        <file>shotcuticon_meter.svg</file>
+        <file>shotcuticon_rse.svg</file>
+        <file>shotcuticon_dustbox.svg</file>
+        <file>Screentransition_Background.png</file>
+        <file>Screentransition_bar.png</file>
+        <file>BG_undericon1.svg</file>
+        <file>BG_undericon2.svg</file>
+        <file>BG_undericon3.svg</file>
+        <file>BG_undericon4.svg</file>
         <file>DividingLine.svg</file>
         <file>connectivity_active.svg</file>
         <file>connectivity_inactive.svg</file>
@@ -40,6 +46,14 @@
         <file>sdl_inactive.svg</file>
         <file>blank_active.svg</file>
         <file>blank_inactive.svg</file>
+        <file>sdlbt_active.svg</file>
+        <file>sdlbt_inactive.svg</file>
+        <file>sdl_usb_active.svg</file>
+        <file>sdl_usb_inactive.svg</file>
+        <file>tbtnavi_active.svg</file>
+        <file>tbtnavi_inactive.svg</file>
+        <file>warehouse_active.svg</file>
+        <file>warehouse_inactive.svg</file>
         <file>plus_active.svg</file>
         <file>plus_inactive.svg</file>
     </qresource>
