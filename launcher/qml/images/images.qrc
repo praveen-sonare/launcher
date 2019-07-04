@@ -20,6 +20,8 @@
         <file>dashboard_inactive.svg</file>
         <file>hvac_active.svg</file>
         <file>hvac_inactive.svg</file>
+        <file>hudtbt_active.svg</file>
+        <file>hudtbt_inactive.svg</file>
         <file>mixer_active.svg</file>
         <file>mixer_inactive.svg</file>
         <file>mediaplayer_active.svg</file>
