@@ -53,17 +53,27 @@ namespace {
 
 ApplicationModel::Private::Private()
 {
+
+    HMI_DEBUG("launcher", ">>> %s", __func__);
     loadAppInfo();
+    HMI_DEBUG("launcher", "end load app info", 0);
     int times = 22 / this->data_temp.size();
+
+    HMI_DEBUG("launcher", "times: %d", times);
+    HMI_DEBUG("launcher", "size: %d", this->data_temp.size());
+    HMI_DEBUG("launcher", "size: %d", this->data_temp.count());
     if(22 % this->data_temp.size() > 0) {
         ++times;
     }
+    HMI_DEBUG("launcher", "times: %d", times);
     while(times > 0) {
         for(auto i = 0; i < this->data_temp.size(); ++i) {
             this->data.append(this->data_temp.at(i));
+            HMI_DEBUG("launcher", "data append i:%d times:%d", i, times);
         }
         --times;
     }
+    HMI_DEBUG("launcher", "<<< %s", __func__);
 }
 
 void ApplicationModel::Private::loadAppInfo()
@@ -78,6 +88,8 @@ void ApplicationModel::Private::loadAppInfo()
         auto const id = jso["id"].toString();
         auto const icon = get_icon_name(jso);
 
+        HMI_DEBUG("launcher", "data size: %d", this->data_temp.size());
+
         // Hide HomeScreen icon itself
         if (name != "launcher" &&
             name != "homescreen" &&
@@ -86,14 +98,16 @@ void ApplicationModel::Private::loadAppInfo()
             this->data_temp.append(AppInfo(icon, name, id));
         }
         if (name == "tachometer") {
+            tachometerIndex = appCount;
             HMI_DEBUG("launcher", "tachometer index:%d", tachometerIndex);
-            tachometerIndex = appCount - 1;
         }
         appCount++;
 
         HMI_DEBUG("launcher","name: %s icon: %s id: %s.", name.toStdString().c_str(), icon.toStdString().c_str(), id.toStdString().c_str());
     }
+    HMI_DEBUG("launcher", ">>> swap size: %d", this->data_temp.size());
     this->data_temp.swap(tachometerIndex, 4);
+    HMI_DEBUG("launcher", "<<< swap size %d", this->data_temp.size());
 }
 
 ApplicationModel::ApplicationModel(QObject *parent)
