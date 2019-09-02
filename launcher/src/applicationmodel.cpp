@@ -79,6 +79,7 @@ ApplicationModel::Private::Private()
 void ApplicationModel::Private::loadAppInfo()
 {
     QString apps = afm_user_daemon_proxy->runnables(QStringLiteral(""));
+    HMI_DEBUG("launcher", "app data %s", apps.toStdString().c_str());
     QJsonDocument japps = QJsonDocument::fromJson(apps.toUtf8());
     int appCount = 0;
     int tachometerIndex = 0;
