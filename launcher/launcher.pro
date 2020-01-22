@@ -19,7 +19,6 @@ QT = qml quick dbus websockets
 CONFIG += c++11 link_pkgconfig
 DESTDIR = $${OUT_PWD}/../package/root/bin
 
-include(../interfaces/interfaces.pri)
 include(../pws/pws.pri)
 
 SOURCES += \

@@ -16,9 +16,9 @@ TEMPLATE = subdirs
 
 load(configure)
 
-SUBDIRS = pws interfaces \
+SUBDIRS = pws \
     launcher \
     package
 
-launcher.depends = interfaces pws
+launcher.depends = pws
 package.depends += launcher
