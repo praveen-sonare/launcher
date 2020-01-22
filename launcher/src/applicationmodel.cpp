@@ -21,12 +21,12 @@
 
 #include "hmi-debug.h"
 
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
+
 #include <QtDBus/QDBusInterface>
 #include <QtDBus/QDBusReply>
-
-#include "afm_user_daemon_proxy.h"
-
-extern org::AGL::afm::user *afm_user_daemon_proxy;
 
 class ApplicationModel::Private
 {

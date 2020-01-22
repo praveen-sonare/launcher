@@ -18,6 +18,8 @@
 #ifndef APPLICATIONMODEL_H
 #define APPLICATIONMODEL_H
 
+#include <QDebug>
+#include <QFile>
 #include <QtCore/QAbstractListModel>
 
 class ApplicationModel : public QAbstractListModel

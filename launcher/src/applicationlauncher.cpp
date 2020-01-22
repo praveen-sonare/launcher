@@ -18,13 +18,9 @@
 
 #include "applicationlauncher.h"
 
-#include "afm_user_daemon_proxy.h"
-
 #include "hmi-debug.h"
 
-extern org::AGL::afm::user *afm_user_daemon_proxy;
-
-ApplicationLauncher::ApplicationLauncher(QObject *parent)
+ApplicationLauncher::ApplicationLauncher(const QString &conn_str, QObject *parent)
     : QObject(parent)
     , m_launching(false)
     , m_timeout(new QTimer(this))
@@ -43,15 +39,23 @@ ApplicationLauncher::ApplicationLauncher(QObject *parent)
     connect(this, &ApplicationLauncher::currentChanged, [&]() {
         setLaunching(false);
     });
+
+    m_launching = false;
+    m_launcher = new Launcher(conn_str, parent);
+
+    if (m_launcher->setup_pws_connection() != 0)
+	    HMI_DEBUG("Launcher","ApplicationLauncher failed to set-up connection to afm-system-daemon");
 }
 
 int ApplicationLauncher::launch(const QString &application)
 {
     int result = -1;
-    HMI_DEBUG("launch","ApplicationLauncher launch %s.", application.toStdString().c_str());
+    HMI_DEBUG("Launcher","ApplicationLauncher launch %s.", application.toStdString().c_str());
 
-    result = afm_user_daemon_proxy->start(application).value().toInt();
-    HMI_DEBUG("launch","ApplicationLauncher pid: %d.", result);
+    if (m_launcher->connection_is_set())
+	    result = m_launcher->start(application);
+
+    HMI_DEBUG("Launcher","ApplicationLauncher pid: %d.", result);
 
     if (result > 1) {
         setLaunching(true);
@@ -83,3 +87,5 @@ void ApplicationLauncher::setCurrent(const QString &current)
     m_current = current;
     emit currentChanged(current);
 }
+
+
