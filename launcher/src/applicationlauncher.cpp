@@ -87,5 +87,3 @@ void ApplicationLauncher::setCurrent(const QString &current)
     m_current = current;
     emit currentChanged(current);
 }
-
-

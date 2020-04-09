@@ -19,6 +19,7 @@ public:
 	//void init(int port, const char* token, QLibWindowmanager *qwm, QString myname);
 	//Q_INVOKABLE void tapShortcut(QString application_id);
 	Q_INVOKABLE size_t getRunnables(void);
+	Q_INVOKABLE int launch(const QString &app_id);
 
 	//void onRep(struct json_object* reply_contents);
 	//static void* myThis;

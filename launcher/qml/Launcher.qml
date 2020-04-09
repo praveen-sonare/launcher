@@ -75,6 +75,17 @@ ApplicationWindow {
             }
         }
 
+	Timer {
+		id: timer_start_show
+		interval: 500
+		running: false
+		repeat: false
+
+		onTriggered: {
+			console.log("Should be able to see the the surface as the compositor will by default show it")
+		}
+	}
+
         MouseArea {
             id: loc
             anchors.fill: parent
@@ -89,7 +100,11 @@ ApplicationWindow {
                     return
                 }
                 if (currentId === '') {
-                    homescreenHandler.tapShortcut(applicationModel.appid(loc.index))
+                    //homescreenHandler.tapShortcut(applicationModel.appid(loc.index))
+		    var app_id = applicationModel.appid(loc.index)
+		    console.log("Trying to launch " + app_id)
+                    homescreenHandler.launch(app_id)
+		    timer_start_show.running = true
                 } else {
                     currentId = ''
                 }

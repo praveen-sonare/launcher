@@ -28,3 +28,13 @@ ApplicationHandler::getRunnables(void)
 
 	return runnables;
 }
+
+int
+ApplicationHandler::launch(const QString &app_id)
+{
+	if (m_launcher) {
+		return m_launcher->start(app_id);
+	}
+
+	return -1;
+}
