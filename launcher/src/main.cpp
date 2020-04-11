@@ -24,20 +24,75 @@
 #include <QQuickWindow>
 #include <QThread>
 #include <QUrlQuery>
+#include <qpa/qplatformnativeinterface.h>
 
 #include <QDBusMetaType>
 #include <QDBusArgument>
 
+#include <wayland-client.h>
+#include "wayland-agl-shell-desktop-client-protocol.h"
+
 #include "applicationlauncher.h"
 #include "applicationmodel.h"
 #include "applicationhandler.h"
+#include "shell-desktop.h"
 #include "appinfo.h"
 
 #define CONNECT_STR "unix:/run/platform/apis/ws/afm-main"
 
+// this and the agl-shell extension should be added in some kind of a wrapper
+// for easy usage
+static void global_add(void *data, struct wl_registry *reg, uint32_t name,
+		const char *interface, uint32_t version)
+{
+	struct agl_shell_desktop **shell =
+		static_cast<struct agl_shell_desktop **>(data);
+
+	if (strcmp(interface, agl_shell_desktop_interface.name) == 0) {
+		*shell = static_cast<struct agl_shell_desktop *>(
+				wl_registry_bind(reg, name, &agl_shell_desktop_interface, version)
+				);
+	}
+}
+
+static void global_remove(void *data, struct wl_registry *reg, uint32_t id)
+{
+	(void) data;
+	(void) reg;
+	(void) id;
+}
+
+static const struct wl_registry_listener registry_listener = {
+	global_add,
+	global_remove,
+};
+
+static struct agl_shell_desktop *
+register_agl_shell_desktop(void)
+{
+	struct wl_display *wl;
+	struct wl_registry *registry;
+	struct agl_shell_desktop *shell = nullptr;
+
+	QPlatformNativeInterface *native = qApp->platformNativeInterface();
+
+	wl = static_cast<struct wl_display *>(native->nativeResourceForIntegration("display"));
+	registry = wl_display_get_registry(wl);
+
+	wl_registry_add_listener(registry, &registry_listener, &shell);
+	// Roundtrip to get all globals advertised by the compositor
+	wl_display_roundtrip(wl);
+	wl_registry_destroy(registry);
+
+	return shell;
+}
+
+
+
 int main(int argc, char *argv[])
 {
     QString myname = QString("launcher");
+    struct agl_shell_desktop *ashell = nullptr;
     QGuiApplication a(argc, argv);
 
     QCommandLineParser parser;
@@ -67,6 +122,7 @@ int main(int argc, char *argv[])
 	    new ApplicationLauncher(CONNECT_STR, &a);
     ApplicationHandler *homescreenHandler =
 	    new ApplicationHandler(nullptr, launcher->get_launcher());
+    ashell = register_agl_shell_desktop();
 
     QUrl bindingAddress;
     bindingAddress.setScheme(QStringLiteral("ws"));
@@ -83,6 +139,13 @@ int main(int argc, char *argv[])
 
     engine.rootContext()->setContextProperty(QStringLiteral("homescreenHandler"), homescreenHandler);
     engine.rootContext()->setContextProperty(QStringLiteral("launcher"), launcher);
+
+    if (ashell) {
+	    std::shared_ptr<struct agl_shell_desktop> shell{ashell, agl_shell_desktop_destroy};
+	    Shell *agl_shell = new Shell(shell, &a);
+	    engine.rootContext()->setContextProperty("shell", agl_shell);
+    }
+
     engine.load(QUrl(QStringLiteral("qrc:/Launcher.qml")));
 
     homescreenHandler->getRunnables();

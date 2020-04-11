@@ -15,15 +15,17 @@
 
 TEMPLATE = app
 TARGET = launcher
-QT = qml quick dbus websockets
-CONFIG += c++11 link_pkgconfig
+QT = qml quick dbus websockets gui-private
+CONFIG += c++11 link_pkgconfig wayland-scanner pkgdatadir
 DESTDIR = $${OUT_PWD}/../package/root/bin
+PKGCONFIG += wayland-client
 
 include(../pws/pws.pri)
 
 SOURCES += \
     src/main.cpp \
     src/applicationmodel.cpp \
+    src/shell-desktop.cpp \
     src/appinfo.cpp \
     src/applicationlauncher.cpp \
     src/applicationhandler.cpp
@@ -31,6 +33,7 @@ SOURCES += \
 HEADERS  += \
     src/applicationlauncher.h \
     src/applicationmodel.h \
+    src/shell-desktop.h \
     src/appinfo.h \
     src/applicationhandler.h
 
@@ -40,3 +43,6 @@ OTHER_FILES += \
 RESOURCES += \
     qml/images/images.qrc \
     qml/qml.qrc
+
+WAYLANDCLIENTSOURCES += \
+    protocol/agl-shell-desktop.xml
