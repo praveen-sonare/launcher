@@ -26,6 +26,7 @@ ApplicationWindow {
     height: container.height * container.scale
 
     property int pid: -1
+    property string app_id: ''
 
     Item {
         id: container
@@ -82,7 +83,9 @@ ApplicationWindow {
 		repeat: false
 
 		onTriggered: {
-			console.log("Should be able to see the the surface as the compositor will by default show it")
+			console.log("Activating app_id " + app_id)
+			shell.activate_app(Window.window, app_id)
+			app_id = ''
 		}
 	}
 
@@ -101,11 +104,30 @@ ApplicationWindow {
                 }
                 if (currentId === '') {
                     //homescreenHandler.tapShortcut(applicationModel.appid(loc.index))
-		    var app_id = applicationModel.appid(loc.index)
-		    console.log("Trying to launch " + app_id)
-                    homescreenHandler.launch(app_id)
-		    timer_start_show.running = true
+		    if (app_id === '') {
+			    app_id = applicationModel.appid(loc.index)
+			    console.log("Trying to launch " + app_id)
+
+			    if (pid === -1) {
+				    console.log("pid is not set: " + pid)
+				    pid = homescreenHandler.launch(app_id)
+			    } else {
+				    console.log("pid is already set: " + pid)
+				    pid = homescreenHandler.launch(app_id)
+			    }
+
+			    if (pid > 0) {
+				    console.log("Activating timer to activate app " + app_id)
+				    timer_start_show.running = true
+			    } else {
+				    app_id = ''
+			    }
+		    } else {
+			    console.log("app_id is not empty = " + app_id)
+			    app_id = ''
+		    }
                 } else {
+		    console.log("Current_id is not empty!")
                     currentId = ''
                 }
             }
