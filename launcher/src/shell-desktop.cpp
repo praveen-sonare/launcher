@@ -49,5 +49,5 @@ void Shell::activate_app(QWindow *win, const QString &app_id)
 	output = getWlOutput(screen);
 	qDebug() << "will activate app: " << app_id;
 	agl_shell_desktop_activate_app(this->shell.get(),
-			       app_id.toStdString().c_str(), output);
+			       app_id.toStdString().c_str(), NULL, output);
 }
