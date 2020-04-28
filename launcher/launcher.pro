@@ -15,20 +15,22 @@
 
 TEMPLATE = app
 TARGET = launcher
-QT = qml quick websockets
-CONFIG += c++11 link_pkgconfig
+QT = qml quick websockets gui-private
+CONFIG += c++11 link_pkgconfig wayland-scanner
 DESTDIR = $${OUT_PWD}/../package/root/bin
-PKGCONFIG += qlibwindowmanager libhomescreen
+PKGCONFIG += libhomescreen wayland-client
 
 SOURCES += \
     src/main.cpp \
     src/applicationmodel.cpp \
     src/appinfo.cpp \
+    src/shell-desktop.cpp \
     src/homescreenhandler.cpp
 
 HEADERS  += \
     src/applicationmodel.h \
     src/appinfo.h \
+    src/shell-desktop.h \
     src/homescreenhandler.h
 
 OTHER_FILES += \
@@ -37,3 +39,6 @@ OTHER_FILES += \
 RESOURCES += \
     qml/images/images.qrc \
     qml/qml.qrc
+
+WAYLANDCLIENTSOURCES += \
+    protocol/agl-shell-desktop.xml
