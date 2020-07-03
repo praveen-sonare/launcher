@@ -30,10 +30,9 @@ ApplicationWindow {
     Item {
         id: container
         anchors.centerIn: parent
-        width: Window.width
-        height: Window.height
-        //scale: screenInfo.scale_factor()
-        scale: 1
+	height: (1920 - 218 - 215)
+	width: 1080
+	scale: (Screen.width / 1080.0)
 
         Image {
           anchors.centerIn: parent
